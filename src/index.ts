@@ -21,6 +21,8 @@ export { CleverFormsValidationError, validateSubmission } from './runtime/valida
 export { CleverFormsSchemaError, validateFormSchema } from './runtime/schemaValidation.js'
 export { createCleverFormsClient } from './runtime/client.js'
 export { cleverFormsTranslations } from './i18n/index.js'
+export { cleverFormTemplates, getCleverFormTemplate, cloneCleverFormTemplate } from './templates/index.js'
+export type { CleverFormTemplate } from './templates/index.js'
 
 export const cleverForms = definePlugin<CleverFormsPluginOptions>({
   slug: '@cleverforge/payload-clever-forms',
