@@ -30,6 +30,7 @@ The current public Core provides the foundation for:
 - a React renderer for Next.js/Payload applications
 - a client submission helper
 - extension hooks for the Forms and Submissions collections
+- administrator-selectable pre-built form templates
 
 ## Installation
 
@@ -63,6 +64,31 @@ export default buildConfig({
 ```
 
 Default collection slugs are `clever-forms` and `clever-form-submissions`. They can be changed through plugin options.
+
+## Pre-built templates
+
+CleverForms includes optional administrator starter templates. When creating a form in Payload Admin, choose **Start From Template** or leave it blank to build from scratch.
+
+Included templates:
+
+- Newsletter Signup
+- Contact Form
+- Quote Request
+- Book an Appointment
+- Bug Report
+- Sponsorship Request
+- Photo / Media Consent
+- Free Consultation
+- Feedback
+- Customer Support
+- Support Request
+- Volunteer Application
+
+The selected template is copied into the new form. Pages, labels, choices, required settings, descriptions, success messages, and submit-button labels remain fully editable after creation.
+
+Templates are provider-neutral and contain no third-party submission URLs, access keys, scripts, credentials, analytics snippets, or external-service attribution.
+
+Templates can also expose optional integration metadata such as a matching CleverConnect Salesforce preset key. CleverForms itself remains independent of Salesforce and CleverConnect.
 
 ## React renderer
 
