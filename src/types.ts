@@ -33,6 +33,8 @@ export type CleverFormPage = {
 export type CleverFormDefinition = {
   id: string | number
   title: string
+  templateKey?: string
+  salesforcePresetKey?: string
   description?: string
   status?: 'draft' | 'published' | 'archived'
   pages?: CleverFormPage[]
