@@ -65,3 +65,34 @@ test('schema validation rejects choice fields without valid unique choices', () 
   }
   assert.throws(() => validateFormSchema(invalid), CleverFormsSchemaError)
 })
+
+
+test('pre-built template catalog includes administrator starter forms without third-party service references', async () => {
+  const { cleverFormTemplates } = await import('../templates/index.js')
+  const keys = cleverFormTemplates.map(template => template.key)
+
+  for (const key of [
+    'newsletter-signup',
+    'contact-form',
+    'quote-request',
+    'book-appointment',
+    'bug-report',
+    'sponsorship-request',
+    'photo-media-consent',
+    'free-consultation',
+    'feedback',
+    'customer-support',
+    'support-request',
+    'volunteer-application',
+  ]) {
+    assert.ok(keys.includes(key), `missing template ${key}`)
+  }
+
+  for (const template of cleverFormTemplates) {
+    assert.ok(template.pages.length > 0)
+    assert.ok(template.pages.every(page => page.fields.length > 0))
+    assert.equal(JSON.stringify(template).toLowerCase().includes('splitforms'), false)
+    assert.equal(JSON.stringify(template).toLowerCase().includes('formkoi'), false)
+    assert.equal(JSON.stringify(template).toLowerCase().includes('access_key'), false)
+  }
+})
