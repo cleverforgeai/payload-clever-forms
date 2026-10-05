@@ -45,6 +45,22 @@ test('Clever Forms installs into Payload and validates real Local API writes', a
       },
     })
 
+    const templated = await payload.create({
+      collection: 'clever-forms',
+      overrideAccess: true,
+      data: {
+        templateKey: 'contact-form',
+        title: 'Website Contact',
+        status: 'draft',
+      },
+    })
+
+    assert.equal(templated.templateKey, 'contact-form')
+    assert.equal(templated.salesforcePresetKey, 'contact-form')
+    assert.ok(Array.isArray(templated.pages))
+    assert.ok((templated.pages?.[0]?.fields?.length ?? 0) >= 4)
+    assert.equal(templated.title, 'Website Contact')
+
     const submission = await payload.create({
       collection: 'clever-form-submissions',
       data: {

@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.3.0-beta.0 - 2026-10-05
+
+### Added
+
+- administrator-selectable pre-built form templates
+- template catalog for newsletter signup, contact, quote request, appointment booking, bug reports, sponsorship requests, photo/media consent, free consultation, feedback, customer support, support requests, and volunteer applications
+- Salesforce preset metadata on templates for optional CleverConnect integration
+- template cloning so administrators can customize every generated field after creation
+- tests covering template catalog integrity and real Payload form creation from a template
+
+### Security and independence
+
+- templates contain no third-party form-service URLs, access keys, scripts, credentials, tracking code, or attribution
+- template selection is optional; blank forms remain supported
+- templates do not require CleverConnect or Salesforce
+
 All notable changes to Clever Forms will be documented here.
 
 ## 0.2.0-beta.1 - 2026-09-23
