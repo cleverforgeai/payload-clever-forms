@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.3.0-beta.1 - 2026-10-06
+
+### Core parity
+
+- add configurable field default values
+- add optional field width metadata
+- initialize the React runtime from configured defaults
+- apply configured defaults during server-side validation
+- normalize numeric, boolean checkbox, and comma-separated multiselect defaults
+- add regression and Payload integration coverage
+
 ## 0.3.0-beta.0 - 2026-10-05
 
 ### Added
