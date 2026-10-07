@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.3.0-beta.5 - 2026-10-06
+
+### Repeaters and extension APIs
+
+- add basic one-level repeaters with min/max rows and nested server validation
+- initialize repeater minimum rows and nested default values
+- improve readable submission summaries for repeated row data
+- add custom field type registration with server-side validators
+- add frontend custom-field rendering hook
+- add reusable copy-on-insert field group helpers
+- add Payload integration coverage for repeater submissions
+
+### Core boundary
+
+- nested repeaters and Upload fields inside repeaters remain outside the basic Core repeater
+- reusable groups are copy-on-insert so later group changes do not silently mutate published forms
+
 ## 0.3.0-beta.4 - 2026-10-06
 
 ### Builder UX and field catalog

@@ -28,12 +28,30 @@ export const normalizeFieldDefaultValue = (field: CleverFormField): unknown => {
   return value
 }
 
+const getFieldDefault = (field: CleverFormField): unknown => {
+  if (field.type === 'repeater') {
+    const rowCount = Math.max(0, field.minRows ?? (field.required ? 1 : 0))
+    if (!rowCount) return undefined
+
+    return Array.from({ length: rowCount }, () => {
+      const row: Record<string, unknown> = {}
+      for (const child of field.repeaterFields ?? []) {
+        const childValue = getFieldDefault(child)
+        if (childValue !== undefined) row[child.name] = childValue
+      }
+      return row
+    })
+  }
+
+  return normalizeFieldDefaultValue(field)
+}
+
 export const getFormDefaultValues = (form: CleverFormDefinition): Record<string, unknown> => {
   const defaults: Record<string, unknown> = {}
 
   for (const page of form.pages ?? []) {
     for (const field of page.fields ?? []) {
-      const value = normalizeFieldDefaultValue(field)
+      const value = getFieldDefault(field)
       if (value !== undefined) defaults[field.name] = value
     }
   }

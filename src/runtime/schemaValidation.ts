@@ -63,6 +63,38 @@ const validateField = (
   if (names.has(name)) issues.push(`Field name "${name}" is duplicated.`)
   names.add(name)
 
+  if (field.type === 'repeater') {
+    if (!field.repeaterFields?.length) {
+      issues.push(`Repeater field "${name}" requires at least one nested field.`)
+    }
+    if (field.minRows !== undefined && (!Number.isFinite(Number(field.minRows)) || Number(field.minRows) < 0)) {
+      issues.push(`Repeater field "${name}" must use a non-negative minimum row count.`)
+    }
+    if (field.maxRows !== undefined && (!Number.isFinite(Number(field.maxRows)) || Number(field.maxRows) < 1)) {
+      issues.push(`Repeater field "${name}" must use a positive maximum row count.`)
+    }
+    if (
+      field.minRows !== undefined &&
+      field.maxRows !== undefined &&
+      Number(field.minRows) > Number(field.maxRows)
+    ) {
+      issues.push(`Repeater field "${name}" cannot have minimum rows greater than maximum rows.`)
+    }
+
+    const childNames = new Set<string>()
+    for (const child of field.repeaterFields ?? []) {
+      if (child.type === 'repeater') {
+        issues.push(`Repeater field "${name}" cannot contain nested repeaters in Core.`)
+        continue
+      }
+      if (child.type === 'upload') {
+        issues.push(`Repeater field "${name}" cannot contain Upload fields in Core.`)
+        continue
+      }
+      validateField(child, childNames, issues, uploadCollections)
+    }
+  }
+
   if (field.type === 'upload') {
     if (!field.uploadCollection?.trim()) {
       issues.push(`Upload field "${name}" requires an upload collection.`)

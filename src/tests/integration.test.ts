@@ -62,6 +62,17 @@ test('Clever Forms installs into Payload and validates real Local API writes', a
               mimeTypes: 'application/pdf',
               maxFileSize: 5000000,
             },
+            {
+              name: 'household',
+              label: 'Household Member',
+              type: 'repeater',
+              minRows: 1,
+              maxRows: 3,
+              repeaterFields: [
+                { name: 'name', label: 'Name', type: 'text', required: true },
+                { name: 'relationship', label: 'Relationship', type: 'text' },
+              ],
+            },
           ],
         }],
         settings: {
@@ -111,7 +122,14 @@ test('Clever Forms installs into Payload and validates real Local API writes', a
       collection: 'clever-form-submissions',
       data: {
         form: form.id,
-        data: { email: 'integration@example.org', state: 'PA', country: 'US', notice: 'ignored', injected: 'removed' },
+        data: {
+          email: 'integration@example.org',
+          state: 'PA',
+          country: 'US',
+          notice: 'ignored',
+          injected: 'removed',
+          household: [{ name: 'Alex', relationship: 'Child' }],
+        },
       },
     })
 
@@ -121,6 +139,7 @@ test('Clever Forms installs into Payload and validates real Local API writes', a
       role: 'member',
       state: 'PA',
       country: 'US',
+      household: [{ name: 'Alex', relationship: 'Child' }],
     })
     assert.ok(submission.submittedAt)
     assert.equal(sentEmails.length, 1)

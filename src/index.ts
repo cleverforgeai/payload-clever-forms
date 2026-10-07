@@ -9,10 +9,13 @@ export type {
   CleverFormDefinition,
   CleverFormField,
   CleverFormFieldType,
+  CleverFormFieldTypeName,
   CleverFormPage,
   CleverFormNotification,
   CleverFormsPreparedEmail,
   CleverFormsFieldConfig,
+  CleverFormFieldGroup,
+  CleverFormsCustomFieldDefinition,
   CleverFormsPluginOptions,
   SubmissionGuardArgs,
   SubmissionHandlerArgs,
@@ -31,6 +34,7 @@ export { parseEmailRecipients, prepareNotificationEmails, renderNotificationTemp
 export { cleverFormsTranslations } from './i18n/index.js'
 export { cleverFormTemplates, getCleverFormTemplate, cloneCleverFormTemplate } from './templates/index.js'
 export { cleverFormRelationship } from './helpers/relationship.js'
+export { defineCleverFormFieldGroup, insertCleverFormFieldGroup } from './helpers/fieldGroups.js'
 export type { CleverFormRelationshipOptions } from './helpers/relationship.js'
 export type { CleverFormTemplate } from './templates/index.js'
 
@@ -48,6 +52,7 @@ export const cleverForms = definePlugin<CleverFormsPluginOptions>({
       adminGroup,
       options.fields,
       options.uploadCollections ?? [],
+      options.customFieldTypes ?? [],
     )
     let submissions = createSubmissionsCollection(submissionsSlug, formsSlug, adminGroup, options)
 

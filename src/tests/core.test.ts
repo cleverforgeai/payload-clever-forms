@@ -10,6 +10,7 @@ import { prepareNotificationEmails, renderNotificationTemplate } from '../runtim
 import { resolveConfirmationRedirect } from '../runtime/confirmation.js'
 import type { CleverFormDefinition } from '../types.js'
 import { cleverFormRelationship } from '../helpers/relationship.js'
+import { defineCleverFormFieldGroup, insertCleverFormFieldGroup } from '../helpers/fieldGroups.js'
 
 const form: CleverFormDefinition = {
   id: 'test',
@@ -372,4 +373,118 @@ test('cleverFormRelationship creates a Payload relationship to CleverForms', () 
   assert.equal(field.relationTo, 'clever-forms')
   assert.equal(field.required, true)
   assert.equal(field.hasMany, false)
+})
+
+
+test('basic repeater validates rows, nested required fields, and row limits', () => {
+  const repeaterForm: CleverFormDefinition = {
+    id: 'repeater',
+    title: 'Household',
+    pages: [{
+      fields: [{
+        name: 'members',
+        label: 'Household Member',
+        type: 'repeater',
+        required: true,
+        minRows: 1,
+        maxRows: 2,
+        repeaterFields: [
+          { name: 'name', label: 'Name', type: 'text', required: true },
+          { name: 'email', label: 'Email', type: 'email' },
+        ],
+      }],
+    }],
+  }
+
+  assert.deepEqual(validateSubmission(repeaterForm, {
+    members: [{ name: 'Jane', email: 'jane@example.org' }],
+  }), {
+    members: [{ name: 'Jane', email: 'jane@example.org' }],
+  })
+
+  assert.throws(
+    () => validateSubmission(repeaterForm, { members: [{ email: 'jane@example.org' }] }),
+    CleverFormsValidationError,
+  )
+
+  assert.throws(
+    () => validateSubmission(repeaterForm, {
+      members: [{ name: 'One' }, { name: 'Two' }, { name: 'Three' }],
+    }),
+    CleverFormsValidationError,
+  )
+})
+
+test('repeater defaults initialize minimum rows with child defaults', () => {
+  const repeaterForm: CleverFormDefinition = {
+    id: 'repeater-defaults',
+    title: 'Repeater Defaults',
+    pages: [{
+      fields: [{
+        name: 'jobs',
+        label: 'Employment',
+        type: 'repeater',
+        minRows: 2,
+        repeaterFields: [
+          { name: 'status', label: 'Status', type: 'text', defaultValue: 'Current' },
+        ],
+      }],
+    }],
+  }
+
+  assert.deepEqual(getFormDefaultValues(repeaterForm), {
+    jobs: [{ status: 'Current' }, { status: 'Current' }],
+  })
+})
+
+test('custom field validators extend server validation without replacing Core', () => {
+  const customForm: CleverFormDefinition = {
+    id: 'custom',
+    title: 'Custom',
+    pages: [{
+      fields: [{
+        name: 'code',
+        label: 'Code',
+        type: 'organizationCode',
+        required: true,
+      }],
+    }],
+  }
+
+  const customFields = [{
+    type: 'organizationCode',
+    label: 'Organization Code',
+    validate: ({ value }: any) => /^[A-Z]{3}-\d{3}$/.test(String(value))
+      ? undefined
+      : 'Code must use AAA-123 format.',
+  }]
+
+  assert.deepEqual(
+    validateSubmission(customForm, { code: 'ABC-123' }, customFields),
+    { code: 'ABC-123' },
+  )
+
+  assert.throws(
+    () => validateSubmission(customForm, { code: 'invalid' }, customFields),
+    CleverFormsValidationError,
+  )
+})
+
+test('reusable field groups use copy-on-insert semantics', () => {
+  const group = defineCleverFormFieldGroup({
+    key: 'contact-details',
+    label: 'Contact Details',
+    fields: [
+      { name: 'email', label: 'Email', type: 'email' },
+      { name: 'phone', label: 'Phone', type: 'phone' },
+    ],
+  })
+
+  const original = [{ name: 'name', label: 'Name', type: 'text' }] as any
+  const inserted = insertCleverFormFieldGroup(original, group)
+
+  assert.equal(inserted.length, 3)
+  assert.equal(inserted[1].name, 'email')
+  inserted[1].label = 'Changed'
+  assert.equal(group.fields[0].label, 'Email')
 })

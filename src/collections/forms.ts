@@ -1,6 +1,6 @@
 import type { CollectionConfig } from 'payload'
 import { createFormFields } from '../fields/formFields.js'
-import type { CleverFormDefinition, CleverFormsFieldConfig } from '../types.js'
+import type { CleverFormDefinition, CleverFormsCustomFieldDefinition, CleverFormsFieldConfig } from '../types.js'
 import { validateFormSchema } from '../runtime/schemaValidation.js'
 import { cleverFormTemplates, cloneCleverFormTemplate } from '../templates/index.js'
 
@@ -9,6 +9,7 @@ export const createFormsCollection = (
   adminGroup: string,
   fields?: CleverFormsFieldConfig,
   uploadCollections: string[] = [],
+  customFieldTypes: CleverFormsCustomFieldDefinition[] = [],
 ): CollectionConfig => ({
   slug,
   admin: {
@@ -68,7 +69,7 @@ export const createFormsCollection = (
     { name: 'title', type: 'text', required: true, localized: true },
     { name: 'description', type: 'textarea', localized: true },
     { name: 'status', type: 'select', required: true, defaultValue: 'draft', options: ['draft', 'published', 'archived'], index: true },
-    ...createFormFields(fields, uploadCollections),
+    ...createFormFields(fields, uploadCollections, customFieldTypes),
     {
       name: 'settings', type: 'group', fields: [
         { name: 'submitButtonLabel', type: 'text', defaultValue: 'Submit', localized: true },
