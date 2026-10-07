@@ -193,6 +193,10 @@ Future authorized MCP tools could expose operations such as `list_forms`, `get_f
 
 The goal is for Core to remain useful for real Payload websites without requiring a subscription.
 
+## Payload Form Builder parity
+
+CleverForms is being reviewed against Payload's official Form Builder so common administrator and runtime workflows are not weaker than the native alternative. See [docs/payload-form-builder-parity.md](docs/payload-form-builder-parity.md) for the current gap analysis, Core/PRO boundaries, and implementation order.
+
 ## Roadmap
 
 ### Phase 1 — Public Core
