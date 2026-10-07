@@ -12,7 +12,10 @@ export class CleverFormsSchemaError extends Error {
   }
 }
 
-export const validateFormSchema = (form: Pick<CleverFormDefinition, 'pages'>): void => {
+export const validateFormSchema = (
+  form: Pick<CleverFormDefinition, 'pages'>,
+  options: { uploadCollections?: string[] } = {},
+): void => {
   const pages = form.pages ?? []
   const issues: string[] = []
   const fields = pages.flatMap((page) => page.fields ?? [])
@@ -25,7 +28,7 @@ export const validateFormSchema = (form: Pick<CleverFormDefinition, 'pages'>): v
   }
 
   for (const field of fields) {
-    validateField(field, names, issues)
+    validateField(field, names, issues, options.uploadCollections ?? [])
   }
 
   const allNames = new Set(fields.map((field) => field.name))
@@ -41,7 +44,12 @@ export const validateFormSchema = (form: Pick<CleverFormDefinition, 'pages'>): v
   if (issues.length) throw new CleverFormsSchemaError(issues)
 }
 
-const validateField = (field: CleverFormField, names: Set<string>, issues: string[]) => {
+const validateField = (
+  field: CleverFormField,
+  names: Set<string>,
+  issues: string[],
+  uploadCollections: string[],
+) => {
   const name = field.name?.trim()
   if (!name) {
     issues.push('Every field must have a name.')
@@ -54,6 +62,17 @@ const validateField = (field: CleverFormField, names: Set<string>, issues: strin
 
   if (names.has(name)) issues.push(`Field name "${name}" is duplicated.`)
   names.add(name)
+
+  if (field.type === 'upload') {
+    if (!field.uploadCollection?.trim()) {
+      issues.push(`Upload field "${name}" requires an upload collection.`)
+    } else if (!uploadCollections.includes(field.uploadCollection)) {
+      issues.push(`Upload field "${name}" references upload collection "${field.uploadCollection}" that is not enabled in CleverForms.`)
+    }
+    if (field.maxFileSize !== undefined && (!Number.isFinite(Number(field.maxFileSize)) || Number(field.maxFileSize) <= 0)) {
+      issues.push(`Upload field "${name}" must use a positive maximum file size.`)
+    }
+  }
 
   if (choiceFieldTypes.has(field.type)) {
     if (!field.choices?.length) issues.push(`Field "${name}" requires at least one choice.`)
