@@ -19,6 +19,22 @@ export const createFormFields = (config: CleverFormsFieldConfig = {}): Field[] =
     { name: 'type', type: 'select', required: true, options: typeOptions },
     { name: 'description', type: 'textarea', localized: true },
     { name: 'placeholder', type: 'text', localized: true },
+    {
+      name: 'defaultValue',
+      label: 'Default Value',
+      type: 'text',
+      admin: {
+        description: 'Optional initial value shown before the user enters a response. Numeric and checkbox values are normalized by the runtime.',
+      },
+    },
+    {
+      name: 'width',
+      label: 'Field Width',
+      type: 'text',
+      admin: {
+        description: 'Optional CSS width such as 100%, 50%, 33.333%, or 24rem.',
+      },
+    },
     { name: 'required', type: 'checkbox', defaultValue: false },
     {
       name: 'choices', type: 'array',
