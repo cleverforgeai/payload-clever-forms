@@ -3,6 +3,7 @@ import assert from 'node:assert/strict'
 import { conditionMatches } from '../runtime/logic.js'
 import { CleverFormsValidationError, validateSubmission } from '../runtime/validation.js'
 import { CleverFormsSchemaError, validateFormSchema } from '../runtime/schemaValidation.js'
+import { getFormDefaultValues } from '../runtime/defaults.js'
 import type { CleverFormDefinition } from '../types.js'
 
 const form: CleverFormDefinition = {
@@ -95,4 +96,45 @@ test('pre-built template catalog includes administrator starter forms without th
     assert.equal(JSON.stringify(template).toLowerCase().includes('formkoi'), false)
     assert.equal(JSON.stringify(template).toLowerCase().includes('access_key'), false)
   }
+})
+
+
+test('field defaults are normalized and merged across pages', () => {
+  const defaultsForm: CleverFormDefinition = {
+    id: 'defaults',
+    title: 'Defaults',
+    pages: [{
+      fields: [
+        { name: 'name', label: 'Name', type: 'text', defaultValue: 'Jane' },
+        { name: 'count', label: 'Count', type: 'number', defaultValue: '3' },
+        { name: 'consent', label: 'Consent', type: 'checkbox', defaultValue: 'true' },
+        { name: 'topics', label: 'Topics', type: 'multiselect', defaultValue: 'one, two', choices: [
+          { label: 'One', value: 'one' },
+          { label: 'Two', value: 'two' },
+        ] },
+      ],
+    }],
+  }
+
+  assert.deepEqual(getFormDefaultValues(defaultsForm), {
+    name: 'Jane',
+    count: 3,
+    consent: true,
+    topics: ['one', 'two'],
+  })
+})
+
+test('server validation applies configured defaults when a value is omitted', () => {
+  const defaultsForm: CleverFormDefinition = {
+    id: 'defaults-submit',
+    title: 'Defaults Submit',
+    pages: [{
+      fields: [
+        { name: 'name', label: 'Name', type: 'text', required: true, defaultValue: 'Jane' },
+        { name: 'count', label: 'Count', type: 'number', defaultValue: '3' },
+      ],
+    }],
+  }
+
+  assert.deepEqual(validateSubmission(defaultsForm, {}), { name: 'Jane', count: 3 })
 })
