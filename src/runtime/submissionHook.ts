@@ -2,6 +2,8 @@ import type { CollectionAfterChangeHook, CollectionBeforeChangeHook } from 'payl
 import type { CleverFormDefinition, CleverFormsPluginOptions } from '../types.js'
 import { validateSubmission } from './validation.js'
 import { sendFormNotifications } from './email.js'
+import { validateUploadReferences } from './uploads.js'
+import { formatSubmissionSummary, getSubmissionEmail } from './submissionSummary.js'
 
 export const createSubmissionHook = (
   formsSlug: string,
@@ -20,9 +22,13 @@ export const createSubmissionHook = (
   if (options.beforeSubmission) await options.beforeSubmission({ form, data: rawData, rawData, req })
 
   const validated = validateSubmission(form, rawData)
+  await validateUploadReferences(form, validated, req)
+
   data.data = validated
   data.status = 'submitted'
   data.submittedAt = new Date().toISOString()
+  data.submissionSummary = formatSubmissionSummary(form, validated)
+  data.submitterEmail = data.submitterEmail || getSubmissionEmail(form, validated)
 
   return data
 }
