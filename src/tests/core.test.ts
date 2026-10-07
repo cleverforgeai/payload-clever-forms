@@ -388,7 +388,7 @@ test('basic repeater validates rows, nested required fields, and row limits', ()
         required: true,
         minRows: 1,
         maxRows: 2,
-        fields: [
+        repeaterFields: [
           { name: 'name', label: 'Name', type: 'text', required: true },
           { name: 'email', label: 'Email', type: 'email' },
         ],
@@ -425,7 +425,7 @@ test('repeater defaults initialize minimum rows with child defaults', () => {
         label: 'Employment',
         type: 'repeater',
         minRows: 2,
-        fields: [
+        repeaterFields: [
           { name: 'status', label: 'Status', type: 'text', defaultValue: 'Current' },
         ],
       }],
