@@ -25,6 +25,11 @@ test('Clever Forms installs into Payload and validates real Local API writes', a
   })
 
   const payload = await getPayload({ config })
+  const sentEmails: Array<Record<string, unknown>> = []
+  ;(payload as any).sendEmail = async (message: Record<string, unknown>) => {
+    sentEmails.push(message)
+    return {}
+  }
 
   try {
     assert.ok(payload.collections['clever-forms'])
@@ -40,8 +45,21 @@ test('Clever Forms installs into Payload and validates real Local API writes', a
           fields: [
             { name: 'email', label: 'Email', type: 'email', required: true },
             { name: 'role', label: 'Role', type: 'select', defaultValue: 'member', width: '50%', choices: [{ label: 'Member', value: 'member' }] },
+            { name: 'state', label: 'State', type: 'state' },
+            { name: 'country', label: 'Country', type: 'country' },
+            { name: 'notice', label: 'Notice', type: 'message', message: 'Display only.' },
           ],
         }],
+        settings: {
+          confirmationType: 'redirect',
+          redirectURL: '/thank-you',
+          notifications: [{
+            enabled: true,
+            to: '{{email}}',
+            subject: 'Thanks {{email}}',
+            body: 'Submission received. {{*}}',
+          }],
+        },
       },
     })
 
@@ -61,17 +79,39 @@ test('Clever Forms installs into Payload and validates real Local API writes', a
     assert.ok((templated.pages?.[0]?.fields?.length ?? 0) >= 4)
     assert.equal(templated.title, 'Website Contact')
 
+    const donation = await payload.create({
+      collection: 'clever-forms',
+      overrideAccess: true,
+      data: {
+        templateKey: 'donation-form',
+        title: 'Xiente Donation',
+        status: 'draft',
+      },
+    })
+
+    assert.equal(donation.templateKey, 'donation-form')
+    assert.ok((donation.pages?.length ?? 0) >= 2)
+    assert.ok(donation.pages?.flatMap((page: any) => page.fields ?? []).some((field: any) => field.type === 'state'))
+
     const submission = await payload.create({
       collection: 'clever-form-submissions',
       data: {
         form: form.id,
-        data: { email: 'integration@example.org', injected: 'removed' },
+        data: { email: 'integration@example.org', state: 'PA', country: 'US', notice: 'ignored', injected: 'removed' },
       },
     })
 
     assert.equal(submission.status, 'submitted')
-    assert.deepEqual(submission.data, { email: 'integration@example.org', role: 'member' })
+    assert.deepEqual(submission.data, {
+      email: 'integration@example.org',
+      role: 'member',
+      state: 'PA',
+      country: 'US',
+    })
     assert.ok(submission.submittedAt)
+    assert.equal(sentEmails.length, 1)
+    assert.deepEqual(sentEmails[0].to, ['integration@example.org'])
+    assert.equal(sentEmails[0].subject, 'Thanks integration@example.org')
 
     await assert.rejects(() => payload.create({
       collection: 'clever-form-submissions',
