@@ -299,8 +299,8 @@ The comparison below reflects the current CleverForms Core implementation and th
 | Rich message/content field | Planned | ✓ |
 | Native multi-page page model | ✓ | Not documented as a dedicated page primitive |
 | General field conditional visibility | ✓ basic rules | Not documented as a general built-in field-visibility feature |
-| Field default values | Planned | ✓ |
-| Field width/layout setting | Planned | ✓ |
+| Field default values | ✓ | ✓ |
+| Field width/layout setting | ✓ width metadata | ✓ |
 | Custom confirmation message | ✓ | ✓ |
 | Redirect after submission | Planned | ✓ |
 | Dynamic submission emails | Planned | ✓ |
@@ -352,7 +352,7 @@ Official reference: [Payload Form Builder Plugin documentation](https://payloadc
 - [x] localization foundation
 - [x] starter template catalog
 - [x] tests and CI foundation
-- [ ] field default values and width/layout controls
+- [x] field default values and width/layout controls
 - [ ] State, Country, and rich Message fields
 - [ ] confirmation redirects
 - [ ] basic dynamic email notifications
