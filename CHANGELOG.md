@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.3.0-beta.3 - 2026-10-06
+
+### Submission Admin
+
+- add human-readable Submission Details generated from form labels
+- automatically surface the first submitted email field as submitterEmail
+- improve default Submission Admin columns
+- keep canonical validated JSON available as read-only troubleshooting data
+
+### Upload fields
+
+- add basic Payload-native Upload field support
+- explicitly allow-list upload-enabled Payload collections
+- support MIME type restrictions, maximum file size, required state, and multiple files
+- upload selected browser files to Payload before creating the form submission
+- store Payload upload document IDs in validated submission data
+- re-validate referenced upload access, MIME type, file size, and multiplicity on the server
+
+### Product review
+
+- document ACF PRO and ACF Gravity Forms Add-on product patterns for future CleverForms Core and PRO work
+- keep implementation independent and Payload-native
+
 ## 0.3.0-beta.2 - 2026-10-06
 
 ### Core parity

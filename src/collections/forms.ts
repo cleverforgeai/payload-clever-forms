@@ -8,6 +8,7 @@ export const createFormsCollection = (
   slug: string,
   adminGroup: string,
   fields?: CleverFormsFieldConfig,
+  uploadCollections: string[] = [],
 ): CollectionConfig => ({
   slug,
   admin: {
@@ -42,7 +43,10 @@ export const createFormsCollection = (
         }
       },
       ({ data }) => {
-        if (data) validateFormSchema(data as unknown as CleverFormDefinition)
+        if (data) validateFormSchema(
+          data as unknown as CleverFormDefinition,
+          { uploadCollections },
+        )
         return data
       },
     ],
@@ -64,7 +68,7 @@ export const createFormsCollection = (
     { name: 'title', type: 'text', required: true, localized: true },
     { name: 'description', type: 'textarea', localized: true },
     { name: 'status', type: 'select', required: true, defaultValue: 'draft', options: ['draft', 'published', 'archived'], index: true },
-    ...createFormFields(fields),
+    ...createFormFields(fields, uploadCollections),
     {
       name: 'settings', type: 'group', fields: [
         { name: 'submitButtonLabel', type: 'text', defaultValue: 'Submit', localized: true },

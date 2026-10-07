@@ -13,6 +13,12 @@ const Users: CollectionConfig = {
   fields: [],
 }
 
+const Media: CollectionConfig = {
+  slug: 'media',
+  upload: true,
+  fields: [],
+}
+
 test('Clever Forms installs into Payload and validates real Local API writes', async () => {
   const directory = await mkdtemp(join(tmpdir(), 'clever-forms-'))
   const dbPath = join(directory, 'integration.db')
@@ -20,8 +26,8 @@ test('Clever Forms installs into Payload and validates real Local API writes', a
   const config = await buildConfig({
     secret: 'clever-forms-integration-test-secret',
     db: sqliteAdapter({ client: { url: `file:${dbPath}` } }),
-    collections: [Users],
-    plugins: [cleverForms({})],
+    collections: [Users, Media],
+    plugins: [cleverForms({ uploadCollections: ['media'] })],
   })
 
   const payload = await getPayload({ config })
@@ -48,6 +54,14 @@ test('Clever Forms installs into Payload and validates real Local API writes', a
             { name: 'state', label: 'State', type: 'state' },
             { name: 'country', label: 'Country', type: 'country' },
             { name: 'notice', label: 'Notice', type: 'message', message: 'Display only.' },
+            {
+              name: 'resume',
+              label: 'Resume',
+              type: 'upload',
+              uploadCollection: 'media',
+              mimeTypes: 'application/pdf',
+              maxFileSize: 5000000,
+            },
           ],
         }],
         settings: {
@@ -112,6 +126,9 @@ test('Clever Forms installs into Payload and validates real Local API writes', a
     assert.equal(sentEmails.length, 1)
     assert.deepEqual(sentEmails[0].to, ['integration@example.org'])
     assert.equal(sentEmails[0].subject, 'Thanks integration@example.org')
+    assert.equal(submission.submitterEmail, 'integration@example.org')
+    assert.match(String(submission.submissionSummary), /Email: integration@example.org/)
+    assert.match(String(submission.submissionSummary), /State: PA/)
 
     await assert.rejects(() => payload.create({
       collection: 'clever-form-submissions',

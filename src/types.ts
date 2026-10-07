@@ -2,7 +2,7 @@ import type { CollectionConfig, PayloadRequest } from 'payload'
 
 export type CleverFormFieldType =
   | 'text' | 'textarea' | 'email' | 'number' | 'select' | 'radio'
-  | 'checkbox' | 'multiselect' | 'date' | 'state' | 'country'
+  | 'checkbox' | 'multiselect' | 'date' | 'state' | 'country' | 'upload'
   | 'heading' | 'paragraph' | 'message'
 
 export type CleverFormChoice = { label: string; value: string }
@@ -24,6 +24,10 @@ export type CleverFormField = {
   defaultValue?: string | number | boolean | string[]
   width?: string
   message?: string
+  uploadCollection?: string
+  mimeTypes?: string
+  maxFileSize?: number
+  multiple?: boolean
   choices?: CleverFormChoice[]
   conditionalLogic?: CleverFormCondition
 }
@@ -85,6 +89,7 @@ export type CleverFormsPluginOptions = {
   submissionsSlug?: string
   adminGroup?: string
   fields?: CleverFormsFieldConfig
+  uploadCollections?: string[]
   defaultToEmail?: string
   emailFailureMode?: 'log' | 'throw'
   beforeEmail?: (

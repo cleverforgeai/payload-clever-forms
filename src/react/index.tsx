@@ -44,6 +44,20 @@ const Field = ({ field, value, onChange }: { field: CleverFormField; value: unkn
   }
   if (field.type === 'checkbox') return <input id={field.name} type="checkbox" name={field.name} checked={Boolean(value)} required={field.required} onChange={(e) => onChange(e.currentTarget.checked)} />
   if (field.type === 'multiselect') return <select id={field.name} multiple name={field.name} value={Array.isArray(value) ? value.map(String) : []} required={field.required} onChange={(e) => onChange(Array.from(e.currentTarget.selectedOptions).map((option) => option.value))}>{field.choices?.map((choice) => <option key={choice.value} value={choice.value}>{choice.label}</option>)}</select>
+  if (field.type === 'upload') {
+    return <input
+      id={field.name}
+      type="file"
+      name={field.name}
+      required={field.required}
+      multiple={field.multiple}
+      accept={field.mimeTypes || undefined}
+      onChange={(e) => {
+        const files = Array.from(e.currentTarget.files ?? [])
+        onChange(field.multiple ? files : files[0])
+      }}
+    />
+  }
   return <input id={field.name} type={field.type === 'email' ? 'email' : field.type === 'number' ? 'number' : field.type === 'date' ? 'date' : 'text'} name={field.name} value={scalar(value)} placeholder={field.placeholder} required={field.required} onChange={(e) => onChange(field.type === 'number' ? e.currentTarget.valueAsNumber : e.currentTarget.value)} />
 }
 
@@ -73,9 +87,11 @@ export const CleverForm = ({ form, apiURL, submissionsSlug, className, initialVa
     setSubmitting(true)
     setError(undefined)
     try {
-      const result = await createCleverFormsClient({ baseURL: apiURL, submissionsSlug }).submit({
+      const client = createCleverFormsClient({ baseURL: apiURL, submissionsSlug })
+      const preparedData = await client.prepareSubmissionData(form, values)
+      const result = await client.submit({
         form: form.id,
-        data: values,
+        data: preparedData,
         sourceURL: typeof window !== 'undefined' ? window.location.href : undefined,
       })
       onSuccess?.(result)

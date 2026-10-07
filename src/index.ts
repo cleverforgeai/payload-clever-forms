@@ -22,6 +22,8 @@ export { conditionMatches, evaluateCondition } from './runtime/logic.js'
 export { CleverFormsValidationError, validateSubmission } from './runtime/validation.js'
 export { CleverFormsSchemaError, validateFormSchema } from './runtime/schemaValidation.js'
 export { createCleverFormsClient } from './runtime/client.js'
+export { getUploadFields, validateUploadReferences } from './runtime/uploads.js'
+export { formatSubmissionSummary, getSubmissionEmail } from './runtime/submissionSummary.js'
 export { getFormDefaultValues, normalizeFieldDefaultValue } from './runtime/defaults.js'
 export { COUNTRY_CODES, COUNTRIES, US_STATES } from './runtime/locations.js'
 export { resolveConfirmationRedirect } from './runtime/confirmation.js'
@@ -39,7 +41,12 @@ export const cleverForms = definePlugin<CleverFormsPluginOptions>({
     const submissionsSlug = options.submissionsSlug ?? 'clever-form-submissions'
     const adminGroup = options.adminGroup ?? 'Clever Forms'
 
-    let forms = createFormsCollection(formsSlug, adminGroup, options.fields)
+    let forms = createFormsCollection(
+      formsSlug,
+      adminGroup,
+      options.fields,
+      options.uploadCollections ?? [],
+    )
     let submissions = createSubmissionsCollection(submissionsSlug, formsSlug, adminGroup, options)
 
     if (options.extendFormsCollection) forms = options.extendFormsCollection(forms)

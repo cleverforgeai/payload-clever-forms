@@ -5,10 +5,18 @@ const defaultEnabled = {
   text: true, textarea: true, email: true, number: true, select: true,
   radio: true, checkbox: true, multiselect: true, date: true,
   state: true, country: true, heading: true, paragraph: true, message: true,
+  upload: false,
 } as const
 
-export const createFormFields = (config: CleverFormsFieldConfig = {}): Field[] => {
-  const enabled = { ...defaultEnabled, ...config }
+export const createFormFields = (
+  config: CleverFormsFieldConfig = {},
+  uploadCollections: string[] = [],
+): Field[] => {
+  const enabled = {
+    ...defaultEnabled,
+    ...(uploadCollections.length ? { upload: true } : {}),
+    ...config,
+  }
   const typeOptions = Object.entries(enabled)
     .filter(([, value]) => value !== false)
     .map(([value]) => ({ label: value, value }))
@@ -45,6 +53,38 @@ export const createFormFields = (config: CleverFormsFieldConfig = {}): Field[] =
       },
     },
     { name: 'required', type: 'checkbox', defaultValue: false },
+    {
+      name: 'uploadCollection',
+      label: 'Upload Collection',
+      type: 'select',
+      options: uploadCollections.map((value) => ({ label: value, value })),
+      admin: {
+        description: 'Required for Upload fields. The target collection must be upload-enabled in Payload.',
+      },
+    },
+    {
+      name: 'mimeTypes',
+      label: 'Allowed MIME Types',
+      type: 'text',
+      admin: {
+        description: 'Optional comma-separated MIME types such as image/*, application/pdf.',
+      },
+    },
+    {
+      name: 'maxFileSize',
+      label: 'Maximum File Size (bytes)',
+      type: 'number',
+      min: 1,
+      admin: {
+        description: 'Optional per-file limit in bytes.',
+      },
+    },
+    {
+      name: 'multiple',
+      label: 'Allow Multiple Files',
+      type: 'checkbox',
+      defaultValue: false,
+    },
     {
       name: 'choices', type: 'array',
       fields: [

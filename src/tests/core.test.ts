@@ -4,6 +4,8 @@ import { conditionMatches } from '../runtime/logic.js'
 import { CleverFormsValidationError, validateSubmission } from '../runtime/validation.js'
 import { CleverFormsSchemaError, validateFormSchema } from '../runtime/schemaValidation.js'
 import { getFormDefaultValues } from '../runtime/defaults.js'
+import { validateUploadReferences } from '../runtime/uploads.js'
+import { formatSubmissionSummary, getSubmissionEmail } from '../runtime/submissionSummary.js'
 import { prepareNotificationEmails, renderNotificationTemplate } from '../runtime/email.js'
 import { resolveConfirmationRedirect } from '../runtime/confirmation.js'
 import type { CleverFormDefinition } from '../types.js'
@@ -230,4 +232,95 @@ test('Donation Form template includes donation choices, payment placeholder, and
   assert.equal(byName.get('state')?.type, 'state')
   assert.equal(byName.get('email_opt_in')?.type, 'checkbox')
   assert.equal(byName.get('sms_opt_in')?.type, 'radio')
+})
+
+
+test('submission summaries use field labels and detect the first email field', () => {
+  const summaryForm: CleverFormDefinition = {
+    id: 'summary',
+    title: 'Summary',
+    pages: [{
+      fields: [
+        { name: 'first_name', label: 'First Name', type: 'text' },
+        { name: 'email', label: 'Email', type: 'email' },
+        { name: 'notice', label: 'Notice', type: 'message', message: 'Display only.' },
+      ],
+    }],
+  }
+
+  const data = { first_name: 'Jane', email: 'jane@example.org' }
+  assert.equal(formatSubmissionSummary(summaryForm, data), 'First Name: Jane\nEmail: jane@example.org')
+  assert.equal(getSubmissionEmail(summaryForm, data), 'jane@example.org')
+})
+
+test('upload reference validation enforces collection, MIME type, size, and multiplicity', async () => {
+  const uploadForm: CleverFormDefinition = {
+    id: 'upload-form',
+    title: 'Upload',
+    pages: [{
+      fields: [{
+        name: 'resume',
+        label: 'Resume',
+        type: 'upload',
+        uploadCollection: 'media',
+        mimeTypes: 'application/pdf',
+        maxFileSize: 1000,
+        multiple: false,
+        required: true,
+      }],
+    }],
+  }
+
+  const req = {
+    payload: {
+      findByID: async ({ id }: { id: string | number }) => ({
+        id,
+        mimeType: 'application/pdf',
+        filesize: 500,
+      }),
+    },
+  } as any
+
+  await assert.doesNotReject(() => validateUploadReferences(uploadForm, { resume: 'file-1' }, req))
+
+  const wrongMimeReq = {
+    payload: {
+      findByID: async () => ({
+        id: 'file-1',
+        mimeType: 'image/png',
+        filesize: 500,
+      }),
+    },
+  } as any
+
+  await assert.rejects(
+    () => validateUploadReferences(uploadForm, { resume: 'file-1' }, wrongMimeReq),
+    CleverFormsValidationError,
+  )
+
+  await assert.rejects(
+    () => validateUploadReferences(uploadForm, { resume: ['file-1', 'file-2'] }, req),
+    CleverFormsValidationError,
+  )
+})
+
+test('schema validation requires enabled upload collections', () => {
+  const uploadForm: CleverFormDefinition = {
+    id: 'upload-schema',
+    title: 'Upload Schema',
+    pages: [{
+      fields: [{
+        name: 'document',
+        label: 'Document',
+        type: 'upload',
+        uploadCollection: 'documents',
+      }],
+    }],
+  }
+
+  assert.doesNotThrow(() => validateFormSchema(uploadForm, { uploadCollections: ['documents'] }))
+  assert.throws(
+    () => validateFormSchema(uploadForm, { uploadCollections: ['media'] }),
+    CleverFormsSchemaError,
+  )
 })

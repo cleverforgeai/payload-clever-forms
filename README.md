@@ -43,7 +43,7 @@ The current public Core includes:
 | State | ✓ |
 | Country | ✓ |
 | Message/display content | ✓ |
-| Upload | Planned |
+| Upload | ✓ basic Payload-native uploads |
 | Payment | Separate CleverPayments product |
 
 Choice fields support configurable labels and values. Field names are schema-validated for uniqueness and allowed characters.
@@ -95,10 +95,13 @@ Each submission stores:
 
 - the related CleverForm
 - validated submission data
+- a human-readable Submission Details summary
 - submission timestamp
-- optional submitter email
+- detected submitter email when the form contains an email field
 - optional source URL
 - submission status
+
+The Submission Admin list includes the form, submitter email, status, and submission time. The edit view presents readable field labels and values before the canonical raw JSON, so staff do not need to interpret raw submission objects during normal review.
 
 The Forms and Submissions collections can both be extended through plugin callbacks.
 
@@ -171,6 +174,28 @@ export default buildConfig({
 ```
 
 Default collection slugs are `clever-forms` and `clever-form-submissions`. They can be changed through plugin options.
+
+### Upload fields
+
+Upload fields are disabled unless one or more Payload upload-enabled collections are explicitly allow-listed:
+
+```ts
+cleverForms({
+  uploadCollections: ['media', 'documents'],
+})
+```
+
+An Upload field can then configure:
+
+- target upload collection
+- allowed MIME types such as `image/*, application/pdf`
+- maximum file size in bytes
+- single or multiple files
+- required / optional behavior
+
+The bundled React runtime uploads selected files to the configured Payload upload collection first, then stores the resulting Payload document ID or IDs in the CleverForms submission. The server re-validates file references, access, MIME type, file size, and multiplicity before accepting the submission.
+
+For private or regulated documents, use a separate secure storage design with tighter Payload access controls. Signed downloads, content inspection, retention rules, and private-storage workflows remain CleverForms PRO concerns.
 
 ## Pre-built templates
 
@@ -329,8 +354,8 @@ The comparison below reflects the current CleverForms Core implementation and th
 | Dynamic submission emails | ✓ text templates | ✓ rich-text templates |
 | Multiple email recipients | ✓ | ✓ |
 | Email field tokens / wildcard output | ✓ `{{field}}`, `{{*}}` | ✓ `{{field}}`, `{{*}}`, `{{*:table}}` |
-| Upload field | Planned | ✓ |
-| Upload MIME / size controls | Planned | ✓ |
+| Upload field | ✓ | ✓ |
+| Upload MIME / size controls | ✓ | ✓ |
 | Payment field / payment callback | Separate CleverPayments product | ✓ optional |
 | Bundled React renderer | ✓ | Frontend renderer is application-defined |
 | Client submission helper | ✓ | No equivalent helper documented |
@@ -357,6 +382,8 @@ CleverForms will close the baseline parity gaps in Core without copying Payload'
 
 See [docs/payload-form-builder-parity.md](docs/payload-form-builder-parity.md) for the implementation plan and Core/PRO boundaries.
 
+The product-pattern review of Advanced Custom Fields PRO and the ACF Gravity Forms Add-on is documented in [docs/reference-review-acf.md](docs/reference-review-acf.md). The review is conceptual only; CleverForms uses an independent Payload-native implementation.
+
 Official reference: [Payload Form Builder Plugin documentation](https://payloadcms.com/docs/plugins/form-builder).
 
 ## Roadmap
@@ -379,8 +406,8 @@ Official reference: [Payload Form Builder Plugin documentation](https://payloadc
 - [x] State, Country, and Message fields
 - [x] confirmation redirects
 - [x] basic dynamic email notifications
-- [ ] improved Submission Admin presentation
-- [ ] basic Payload-native upload field
+- [x] improved Submission Admin presentation
+- [x] basic Payload-native upload field
 - [ ] richer custom-field extension API
 - [ ] full integration test application
 - [ ] accessibility test suite
