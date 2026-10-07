@@ -194,7 +194,7 @@ export const createFormFields = (
         min: 1,
         admin: { condition: typeIs('repeater') },
       } as Field, {
-        name: 'fields',
+        name: 'repeaterFields',
         label: 'Repeater Fields',
         type: 'array',
         admin: {
