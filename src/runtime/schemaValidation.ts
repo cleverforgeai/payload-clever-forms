@@ -82,7 +82,7 @@ const validateField = (
     }
 
     const childNames = new Set<string>()
-    for (const child of field.fields ?? []) {
+    for (const child of field.repeaterFields ?? []) {
       if (child.type === 'repeater') {
         issues.push(`Repeater field "${name}" cannot contain nested repeaters in Core.`)
         continue
