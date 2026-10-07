@@ -30,6 +30,8 @@ export { resolveConfirmationRedirect } from './runtime/confirmation.js'
 export { parseEmailRecipients, prepareNotificationEmails, renderNotificationTemplate } from './runtime/email.js'
 export { cleverFormsTranslations } from './i18n/index.js'
 export { cleverFormTemplates, getCleverFormTemplate, cloneCleverFormTemplate } from './templates/index.js'
+export { cleverFormRelationship } from './helpers/relationship.js'
+export type { CleverFormRelationshipOptions } from './helpers/relationship.js'
 export type { CleverFormTemplate } from './templates/index.js'
 
 export const cleverForms = definePlugin<CleverFormsPluginOptions>({
