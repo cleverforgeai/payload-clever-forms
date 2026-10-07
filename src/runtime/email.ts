@@ -19,19 +19,22 @@ const allFieldsText = (data: Record<string, unknown>): string =>
     .map(([key, value]) => `${key}: ${printable(value)}`)
     .join('\n')
 
+const headerSafe = (value: string): string => value.replace(/[\r\n]+/g, ' ').trim()
+
 export const renderNotificationTemplate = (
   template: string,
   data: Record<string, unknown>,
 ): string => template.replace(TOKEN, (_match, token: string) => {
   const key = token.trim()
   if (key === '*' || key === '*:table') return allFieldsText(data)
+  if (!Object.prototype.hasOwnProperty.call(data, key)) return ''
   return printable(data[key])
 })
 
 export const parseEmailRecipients = (value?: string): string[] =>
   String(value ?? '')
     .split(/[;,]/)
-    .map((item) => item.trim())
+    .map((item) => headerSafe(item))
     .filter(Boolean)
 
 export const prepareNotificationEmails = (
@@ -46,12 +49,12 @@ export const prepareNotificationEmails = (
     .map((notification) => {
       const renderedTo = renderNotificationTemplate(notification.to ?? '', data)
       const to = parseEmailRecipients(renderedTo || defaultToEmail)
-      const replyTo = renderNotificationTemplate(notification.replyTo ?? '', data).trim() || undefined
+      const replyTo = headerSafe(renderNotificationTemplate(notification.replyTo ?? '', data)) || undefined
 
       return {
         to,
         replyTo,
-        subject: renderNotificationTemplate(notification.subject ?? 'New form submission', data),
+        subject: headerSafe(renderNotificationTemplate(notification.subject ?? 'New form submission', data)),
         text: renderNotificationTemplate(notification.body ?? '{{*}}', data),
       }
     })
