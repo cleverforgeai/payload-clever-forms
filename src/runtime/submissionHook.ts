@@ -21,7 +21,7 @@ export const createSubmissionHook = (
   const rawData = (data.data ?? {}) as Record<string, unknown>
   if (options.beforeSubmission) await options.beforeSubmission({ form, data: rawData, rawData, req })
 
-  const validated = validateSubmission(form, rawData)
+  const validated = validateSubmission(form, rawData, options.customFieldTypes ?? [])
   await validateUploadReferences(form, validated, req)
 
   data.data = validated
