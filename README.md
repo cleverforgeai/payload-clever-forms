@@ -49,11 +49,14 @@ The current public Core includes:
 | Country | ✓ |
 | Message/display content | ✓ |
 | Upload | ✓ basic Payload-native uploads |
+| Repeater | ✓ basic one-level repeaters |
 | Payment | Separate CleverPayments product |
 
 Choice fields support configurable labels and values. Number and Range fields support minimum, maximum, and step metadata. Field names are schema-validated for uniqueness and allowed characters.
 
 The Payload Admin builder now hides field settings that do not apply to the selected field type—for example, Upload settings only appear for Upload fields and Choices only appear for choice fields.
+
+Basic Repeaters support one level of nested fields with minimum and maximum row limits. Nested repeaters and Upload fields inside repeaters are intentionally excluded from Core's first repeater implementation.
 
 ### Conditional logic
 
@@ -111,6 +114,12 @@ Each submission stores:
 The Submission Admin list includes the form, submitter email, status, and submission time. The edit view presents readable field labels and values before the canonical raw JSON, so staff do not need to interpret raw submission objects during normal review.
 
 The Forms and Submissions collections can both be extended through plugin callbacks.
+
+### Custom fields and reusable field groups
+
+Custom field types can be registered through `customFieldTypes` with server-side validators, while the React renderer accepts a `renderCustomField` callback for application-specific UI.
+
+Reusable field structures can be defined with `defineCleverFormFieldGroup()` and copied into forms with `insertCleverFormFieldGroup()`. This is intentionally copy-on-insert: changing the source group later does not silently mutate existing or published forms.
 
 ### Email notifications
 
@@ -435,10 +444,12 @@ Official reference: [Payload Form Builder Plugin documentation](https://payloadc
 - [x] basic dynamic email notifications
 - [x] improved Submission Admin presentation
 - [x] basic Payload-native upload field
-- [ ] richer custom-field extension API
+- [x] richer custom-field extension API
 - [x] practical URL, Phone, Date & Time, Time, and Range fields
 - [x] conditional Admin visibility for field-specific settings
 - [x] reusable CleverForm relationship helper
+- [x] reusable copy-on-insert field groups
+- [x] basic one-level repeaters
 - [ ] full integration test application
 - [ ] accessibility test suite
 - [ ] documented theming API
