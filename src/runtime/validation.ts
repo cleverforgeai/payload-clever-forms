@@ -41,8 +41,28 @@ export const validateSubmission = (
       continue
     }
 
-    if (field.type === 'number' && !Number.isFinite(Number(value))) {
+    if ((field.type === 'number' || field.type === 'range') && !Number.isFinite(Number(value))) {
       errors[field.name] = `${field.label} must be a number.`
+      continue
+    }
+
+    if (field.type === 'url') {
+      try {
+        const url = new URL(String(value))
+        if (url.protocol !== 'http:' && url.protocol !== 'https:') throw new Error('invalid protocol')
+      } catch {
+        errors[field.name] = `${field.label} must be a valid http or https URL.`
+        continue
+      }
+    }
+
+    if ((field.type === 'number' || field.type === 'range') && field.min !== undefined && Number(value) < field.min) {
+      errors[field.name] = `${field.label} must be at least ${field.min}.`
+      continue
+    }
+
+    if ((field.type === 'number' || field.type === 'range') && field.max !== undefined && Number(value) > field.max) {
+      errors[field.name] = `${field.label} must be at most ${field.max}.`
       continue
     }
 

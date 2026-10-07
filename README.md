@@ -38,6 +38,11 @@ The current public Core includes:
 | Checkbox | ✓ |
 | Multiselect | ✓ |
 | Date | ✓ |
+| Date & Time | ✓ |
+| Time | ✓ |
+| URL | ✓ |
+| Phone | ✓ |
+| Range | ✓ |
 | Heading | ✓ |
 | Paragraph | ✓ |
 | State | ✓ |
@@ -46,7 +51,9 @@ The current public Core includes:
 | Upload | ✓ basic Payload-native uploads |
 | Payment | Separate CleverPayments product |
 
-Choice fields support configurable labels and values. Field names are schema-validated for uniqueness and allowed characters.
+Choice fields support configurable labels and values. Number and Range fields support minimum, maximum, and step metadata. Field names are schema-validated for uniqueness and allowed characters.
+
+The Payload Admin builder now hides field settings that do not apply to the selected field type—for example, Upload settings only appear for Upload fields and Choices only appear for choice fields.
 
 ### Conditional logic
 
@@ -174,6 +181,26 @@ export default buildConfig({
 ```
 
 Default collection slugs are `clever-forms` and `clever-form-submissions`. They can be changed through plugin options.
+
+### Reusing a CleverForm from another collection
+
+Use the exported relationship helper when a Page, Event, Program, Campaign, or other Payload collection should select one or more CleverForms:
+
+```ts
+import { cleverFormRelationship } from '@cleverforge/payload-clever-forms'
+
+export const Programs = {
+  slug: 'programs',
+  fields: [
+    cleverFormRelationship({
+      name: 'registrationForm',
+      required: false,
+    }),
+  ],
+}
+```
+
+Set `hasMany: true` when the document may reference multiple forms.
 
 ### Upload fields
 
@@ -409,6 +436,9 @@ Official reference: [Payload Form Builder Plugin documentation](https://payloadc
 - [x] improved Submission Admin presentation
 - [x] basic Payload-native upload field
 - [ ] richer custom-field extension API
+- [x] practical URL, Phone, Date & Time, Time, and Range fields
+- [x] conditional Admin visibility for field-specific settings
+- [x] reusable CleverForm relationship helper
 - [ ] full integration test application
 - [ ] accessibility test suite
 - [ ] documented theming API

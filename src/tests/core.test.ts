@@ -9,6 +9,7 @@ import { formatSubmissionSummary, getSubmissionEmail } from '../runtime/submissi
 import { prepareNotificationEmails, renderNotificationTemplate } from '../runtime/email.js'
 import { resolveConfirmationRedirect } from '../runtime/confirmation.js'
 import type { CleverFormDefinition } from '../types.js'
+import { cleverFormRelationship } from '../helpers/relationship.js'
 
 const form: CleverFormDefinition = {
   id: 'test',
@@ -323,4 +324,52 @@ test('schema validation requires enabled upload collections', () => {
     () => validateFormSchema(uploadForm, { uploadCollections: ['media'] }),
     CleverFormsSchemaError,
   )
+})
+
+
+test('new practical field types validate and normalize expected values', () => {
+  const practical: CleverFormDefinition = {
+    id: 'practical',
+    title: 'Practical fields',
+    pages: [{
+      fields: [
+        { name: 'website', label: 'Website', type: 'url', required: true },
+        { name: 'phone', label: 'Phone', type: 'phone' },
+        { name: 'meeting', label: 'Meeting', type: 'datetime' },
+        { name: 'time', label: 'Time', type: 'time' },
+        { name: 'score', label: 'Score', type: 'range', min: 1, max: 10, defaultValue: '5' },
+      ],
+    }],
+  }
+
+  assert.deepEqual(validateSubmission(practical, {
+    website: 'https://example.org',
+    phone: '+1 215 555 0100',
+    meeting: '2026-10-07T12:30',
+    time: '12:30',
+  }), {
+    website: 'https://example.org',
+    phone: '+1 215 555 0100',
+    meeting: '2026-10-07T12:30',
+    time: '12:30',
+    score: 5,
+  })
+
+  assert.throws(
+    () => validateSubmission(practical, { website: 'javascript:alert(1)', score: 20 }),
+    CleverFormsValidationError,
+  )
+})
+
+test('cleverFormRelationship creates a Payload relationship to CleverForms', () => {
+  const field = cleverFormRelationship({
+    name: 'registrationForm',
+    required: true,
+  }) as any
+
+  assert.equal(field.name, 'registrationForm')
+  assert.equal(field.type, 'relationship')
+  assert.equal(field.relationTo, 'clever-forms')
+  assert.equal(field.required, true)
+  assert.equal(field.hasMany, false)
 })

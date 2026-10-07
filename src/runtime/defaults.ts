@@ -4,7 +4,7 @@ export const normalizeFieldDefaultValue = (field: CleverFormField): unknown => {
   const value = field.defaultValue
   if (value === undefined || value === null || value === '') return undefined
 
-  if (field.type === 'number') {
+  if (field.type === 'number' || field.type === 'range') {
     const parsed = typeof value === 'number' ? value : Number(value)
     return Number.isFinite(parsed) ? parsed : undefined
   }
