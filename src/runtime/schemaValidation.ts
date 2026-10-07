@@ -64,7 +64,7 @@ const validateField = (
   names.add(name)
 
   if (field.type === 'repeater') {
-    if (!field.fields?.length) {
+    if (!field.repeaterFields?.length) {
       issues.push(`Repeater field "${name}" requires at least one nested field.`)
     }
     if (field.minRows !== undefined && (!Number.isFinite(Number(field.minRows)) || Number(field.minRows) < 0)) {
