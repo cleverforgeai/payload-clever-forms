@@ -12,25 +12,110 @@ The public package focuses on the reusable Core. Premium products such as Forms 
 
 ## Core capabilities
 
-The current public Core provides the foundation for:
+The current public Core includes:
+
+### Form authoring
 
 - Payload `definePlugin` integration
-- forms and submissions collections
-- multi-page forms
-- reorderable pages and fields through Payload arrays
-- text, textarea, email, number, select, radio, checkbox, multiselect, date, heading, and paragraph field definitions
-- basic conditional logic
-- server-side required/email/number validation
-- server-side allow-list validation for configured choices
-- published/draft/archived form states
+- native Forms and Submissions collections
+- multi-page forms with reorderable pages and fields
+- administrator-selectable starter templates
+- editable form title, description, submit-button label, and success message
+- draft, published, and archived form states
+- optional per-form authentication requirement
+- localized form content through Payload localization
+
+### Field types
+
+| Field type | Current Core |
+| --- | :---: |
+| Text | ✓ |
+| Textarea | ✓ |
+| Email | ✓ |
+| Number | ✓ |
+| Select | ✓ |
+| Radio | ✓ |
+| Checkbox | ✓ |
+| Multiselect | ✓ |
+| Date | ✓ |
+| Heading | ✓ |
+| Paragraph | ✓ |
+| State | Planned |
+| Country | Planned |
+| Rich message/content block | Planned |
+| Upload | Planned |
+| Payment | Separate CleverPayments product |
+
+Choice fields support configurable labels and values. Field names are schema-validated for uniqueness and allowed characters.
+
+### Conditional logic
+
+Core supports field visibility rules with these operators:
+
+- equals
+- not equals
+- contains
+- is empty
+- is not empty
+
+Conditional rules are evaluated in both the runtime and server-side submission validation so hidden fields do not become a validation bypass.
+
+### Validation and security
+
+- required-field validation
+- email-format validation
+- numeric validation
+- choice allow-list enforcement
+- duplicate field-name detection
+- duplicate choice-value detection
+- invalid conditional-reference detection
+- form publication checks
 - authenticated-form enforcement
-- protected submission read access
-- localized form content
+- protected submission reads
+- server-side validation as the security boundary rather than browser validation
+
+### Runtime and frontend
+
+- bundled React renderer for Next.js/Payload applications
+- multi-page Previous / Next navigation
+- runtime conditional visibility
+- client submission helper
+- configurable API base URL and submission collection slug
+- success and error callbacks
+- initial values support
 - English, Spanish, and French runtime translations
-- a React renderer for Next.js/Payload applications
-- a client submission helper
-- extension hooks for the Forms and Submissions collections
-- administrator-selectable pre-built form templates
+
+### Submissions
+
+Each submission stores:
+
+- the related CleverForm
+- validated submission data
+- submission timestamp
+- optional submitter email
+- optional source URL
+- submission status
+
+The Forms and Submissions collections can both be extended through plugin callbacks.
+
+### Templates and integration metadata
+
+Core currently includes 12 editable starter templates:
+
+- Newsletter Signup
+- Contact Form
+- Quote Request
+- Book an Appointment
+- Bug Report
+- Sponsorship Request
+- Photo / Media Consent
+- Free Consultation
+- Feedback
+- Customer Support
+- Support Request
+- Volunteer Application
+
+Templates are provider-neutral. They may expose optional metadata such as a CleverConnect Salesforce preset key, but CleverForms does not require Salesforce or CleverConnect.
 
 ## Installation
 
@@ -193,9 +278,63 @@ Future authorized MCP tools could expose operations such as `list_forms`, `get_f
 
 The goal is for Core to remain useful for real Payload websites without requiring a subscription.
 
-## Payload Form Builder parity
+## Comparison with Payload's official Form Builder
 
-CleverForms is being reviewed against Payload's official Form Builder so common administrator and runtime workflows are not weaker than the native alternative. See [docs/payload-form-builder-parity.md](docs/payload-form-builder-parity.md) for the current gap analysis, Core/PRO boundaries, and implementation order.
+CleverForms is intentionally Payload-native, but it is a separate product from Payload's official `@payloadcms/plugin-form-builder`.
+
+The comparison below reflects the current CleverForms Core implementation and the capabilities documented by Payload for the official Form Builder plugin. Official Payload behavior should be re-checked before every stable CleverForms release.
+
+| Capability | CleverForms Core | Official Payload Form Builder |
+| --- | --- | --- |
+| Dynamic form authoring in Payload Admin | ✓ | ✓ |
+| Forms collection | ✓ | ✓ |
+| Submissions collection | ✓ | ✓ |
+| Text / textarea / email / number | ✓ | ✓ |
+| Select / radio / checkbox | ✓ | ✓ |
+| Date | ✓ | ✓ |
+| Multiselect | ✓ | Not listed as a default field |
+| Heading / paragraph display fields | ✓ | Message field instead |
+| State field | Planned | ✓ |
+| Country field | Planned | ✓ |
+| Rich message/content field | Planned | ✓ |
+| Native multi-page page model | ✓ | Not documented as a dedicated page primitive |
+| General field conditional visibility | ✓ basic rules | Not documented as a general built-in field-visibility feature |
+| Field default values | Planned | ✓ |
+| Field width/layout setting | Planned | ✓ |
+| Custom confirmation message | ✓ | ✓ |
+| Redirect after submission | Planned | ✓ |
+| Dynamic submission emails | Planned | ✓ |
+| Multiple email recipients | Planned | ✓ |
+| Email field tokens / wildcard output | Planned | ✓ |
+| Upload field | Planned | ✓ |
+| Upload MIME / size controls | Planned | ✓ |
+| Payment field / payment callback | Separate CleverPayments product | ✓ optional |
+| Bundled React renderer | ✓ | Frontend renderer is application-defined |
+| Client submission helper | ✓ | No equivalent helper documented |
+| Localized form content | ✓ | Can be composed with Payload localization; not documented as a Form Builder-specific feature |
+| English / Spanish / French runtime strings | ✓ | Not documented as a bundled frontend runtime |
+| Starter template catalog | ✓, 12 templates | No built-in template catalog documented |
+| Per-form authentication toggle | ✓ | Can be implemented with collection/access customization |
+| Collection extension hooks | ✓ | ✓ via form and submission overrides |
+| Server-side allow-list validation for choices | ✓ | Submission validation is handled by the plugin |
+| Provider-neutral Salesforce preset metadata | ✓ | Not applicable |
+| Salesforce integration dependency | None | None |
+
+Official Payload Form Builder also documents:
+
+- redirect relationships for confirmation pages
+- `beforeEmail` customization
+- fallback `defaultToEmail`
+- form and form-submission collection overrides
+- a `handlePayment` extension point
+- configurable upload collections
+- field/block overrides for custom field definitions
+
+CleverForms will close the baseline parity gaps in Core without copying Payload's implementation. Features that are clearly separate products—such as payment-provider integrations, CRM connectors, advanced workflow automation, signatures, and secure document workflows—remain modular CleverForge packages.
+
+See [docs/payload-form-builder-parity.md](docs/payload-form-builder-parity.md) for the implementation plan and Core/PRO boundaries.
+
+Official reference: [Payload Form Builder Plugin documentation](https://payloadcms.com/docs/plugins/form-builder).
 
 ## Roadmap
 
@@ -211,7 +350,15 @@ CleverForms is being reviewed against Payload's official Form Builder so common 
 - [x] React renderer foundation
 - [x] client helper
 - [x] localization foundation
+- [x] starter template catalog
 - [x] tests and CI foundation
+- [ ] field default values and width/layout controls
+- [ ] State, Country, and rich Message fields
+- [ ] confirmation redirects
+- [ ] basic dynamic email notifications
+- [ ] improved Submission Admin presentation
+- [ ] basic Payload-native upload field
+- [ ] richer custom-field extension API
 - [ ] full integration test application
 - [ ] accessibility test suite
 - [ ] documented theming API
