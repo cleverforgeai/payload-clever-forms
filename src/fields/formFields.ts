@@ -138,7 +138,7 @@ export const createFormFields = (
           description: 'Optional increment for Number and Range fields.',
         },
       },
-      {
+      ...(allowRepeater ? [{
         name: 'uploadCollection',
         label: 'Upload Collection',
         type: 'select',
@@ -147,8 +147,7 @@ export const createFormFields = (
           condition: typeIs('upload'),
           description: 'Required for Upload fields. The target collection must be upload-enabled in Payload.',
         },
-      },
-      {
+      } as Field, {
         name: 'mimeTypes',
         label: 'Allowed MIME Types',
         type: 'text',
@@ -156,8 +155,7 @@ export const createFormFields = (
           condition: typeIs('upload'),
           description: 'Optional comma-separated MIME types such as image/*, application/pdf.',
         },
-      },
-      {
+      } as Field, {
         name: 'maxFileSize',
         label: 'Maximum File Size (bytes)',
         type: 'number',
@@ -166,14 +164,13 @@ export const createFormFields = (
           condition: typeIs('upload'),
           description: 'Optional per-file limit in bytes.',
         },
-      },
-      {
+      } as Field, {
         name: 'multiple',
         label: 'Allow Multiple Files',
         type: 'checkbox',
         defaultValue: false,
         admin: { condition: typeIs('upload') },
-      },
+      } as Field] : []),
       {
         name: 'choices',
         type: 'array',
