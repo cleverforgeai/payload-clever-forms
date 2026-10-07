@@ -250,6 +250,7 @@ export const cleverFormTemplates: CleverFormTemplate[] = [
           name: 'other_amount',
           label: 'Other amount',
           type: 'number',
+          required: true,
           conditionalLogic: {
             enabled: true,
             field: 'donation_amount',
@@ -274,6 +275,7 @@ export const cleverFormTemplates: CleverFormTemplate[] = [
           name: 'organization_name',
           label: 'Organization name',
           type: 'text',
+          required: true,
           conditionalLogic: {
             enabled: true,
             field: 'organization_gift',
@@ -292,6 +294,7 @@ export const cleverFormTemplates: CleverFormTemplate[] = [
           name: 'dedication_name',
           label: 'Honoree name',
           type: 'text',
+          required: true,
           conditionalLogic: {
             enabled: true,
             field: 'dedication',
@@ -332,13 +335,13 @@ export const cleverFormTemplates: CleverFormTemplate[] = [
         { name: 'zip_code', label: 'ZIP Code', type: 'text', width: '25%' },
         {
           name: 'email_opt_in',
-          label: "I'd like to receive emails from Xiente",
+          label: "I'd like to receive emails from this organization",
           type: 'checkbox',
           defaultValue: false,
         },
         {
           name: 'sms_opt_in',
-          label: 'Would you like to receive text messages from Xiente?',
+          label: 'Would you like to receive text messages from this organization?',
           type: 'radio',
           choices: [choice('Yes', 'yes'), choice('No', 'no')],
         },
