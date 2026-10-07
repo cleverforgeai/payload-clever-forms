@@ -319,16 +319,16 @@ The comparison below reflects the current CleverForms Core implementation and th
 | Heading / paragraph display fields | ✓ | Message field instead |
 | State field | ✓ | ✓ |
 | Country field | ✓ | ✓ |
-| Message/content field | ✓ | ✓ |
+| Message/content field | ✓ plain-text display | ✓ rich text |
 | Native multi-page page model | ✓ | Not documented as a dedicated page primitive |
 | General field conditional visibility | ✓ basic rules | Not documented as a general built-in field-visibility feature |
 | Field default values | ✓ | ✓ |
 | Field width/layout setting | ✓ width metadata | ✓ |
 | Custom confirmation message | ✓ | ✓ |
-| Redirect after submission | ✓ | ✓ |
-| Dynamic submission emails | ✓ | ✓ |
+| Redirect after submission | ✓ URL | ✓ URL / configured relationship |
+| Dynamic submission emails | ✓ text templates | ✓ rich-text templates |
 | Multiple email recipients | ✓ | ✓ |
-| Email field tokens / wildcard output | ✓ | ✓ |
+| Email field tokens / wildcard output | ✓ `{{field}}`, `{{*}}` | ✓ `{{field}}`, `{{*}}`, `{{*:table}}` |
 | Upload field | Planned | ✓ |
 | Upload MIME / size controls | Planned | ✓ |
 | Payment field / payment callback | Separate CleverPayments product | ✓ optional |
