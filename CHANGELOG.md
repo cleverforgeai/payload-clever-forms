@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.3.0-beta.2 - 2026-10-06
+
+### Core parity
+
+- add dedicated State and Country fields with server-side code validation
+- add display-only Message fields
+- add confirmation redirects with safe http/https URL resolution
+- add multiple dynamic email notifications through Payload's configured email adapter
+- support submission tokens such as `{{email}}` and wildcard `{{*}}`
+- add `defaultToEmail`, `beforeEmail`, and configurable email failure behavior
+- add the Donation Form starter template
+- expand unit and Payload integration coverage
+
+### Donation template
+
+- recurring or one-time donation selection
+- preset donation amounts with conditional Other amount
+- organization-gift and dedication questions
+- donor name, email, phone, and address fields
+- email and SMS communication preferences
+- secure payment placeholder for the separate CleverPayments integration
+
 ## 0.3.0-beta.1 - 2026-10-06
 
 ### Core parity

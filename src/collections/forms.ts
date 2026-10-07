@@ -68,8 +68,39 @@ export const createFormsCollection = (
     {
       name: 'settings', type: 'group', fields: [
         { name: 'submitButtonLabel', type: 'text', defaultValue: 'Submit', localized: true },
+        {
+          name: 'confirmationType',
+          label: 'After Submission',
+          type: 'select',
+          defaultValue: 'message',
+          options: [
+            { label: 'Show confirmation message', value: 'message' },
+            { label: 'Redirect to URL', value: 'redirect' },
+          ],
+        },
         { name: 'successMessage', type: 'textarea', defaultValue: 'Thank you. Your form has been submitted.', localized: true },
+        {
+          name: 'redirectURL',
+          label: 'Confirmation Redirect URL',
+          type: 'text',
+          admin: { description: 'Used when After Submission is set to Redirect to URL. Relative paths and http/https URLs are supported.' },
+        },
         { name: 'requireAuthentication', type: 'checkbox', defaultValue: false },
+        {
+          name: 'notifications',
+          label: 'Email Notifications',
+          type: 'array',
+          admin: {
+            description: 'Send one or more emails after a successful submission using Payload\'s configured email adapter. Templates support {{field_name}} and {{*}}.',
+          },
+          fields: [
+            { name: 'enabled', type: 'checkbox', defaultValue: true },
+            { name: 'to', label: 'To', type: 'text', admin: { description: 'Comma-separated addresses. Submission tokens such as {{email}} are supported.' } },
+            { name: 'replyTo', label: 'Reply-To', type: 'text', admin: { description: 'Optional. Submission tokens are supported.' } },
+            { name: 'subject', type: 'text', defaultValue: 'New form submission' },
+            { name: 'body', type: 'textarea', defaultValue: '{{*}}' },
+          ],
+        },
       ],
     },
   ],

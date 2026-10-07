@@ -9,7 +9,9 @@ export type CleverFormTemplate = {
   pages: CleverFormPage[]
   settings?: {
     submitButtonLabel?: string
+    confirmationType?: 'message' | 'redirect'
     successMessage?: string
+    redirectURL?: string
     requireAuthentication?: boolean
   }
 }
@@ -214,6 +216,142 @@ export const cleverFormTemplates: CleverFormTemplate[] = [
     ], 'Volunteer Application')],
     settings: { submitButtonLabel: 'Send Application', successMessage: 'Thanks! A coordinator will be in touch.' },
   },
+  {
+    key: 'donation-form',
+    title: 'Donation Form',
+    description: 'Donation intake with recurring or one-time giving, donor information, address, dedication, and communications preferences.',
+    category: 'nonprofit',
+    pages: [
+      page([
+        {
+          name: 'donation_frequency',
+          label: 'Make this donation',
+          type: 'radio',
+          required: true,
+          choices: [choice('Monthly', 'monthly'), choice('One-Time', 'one-time')],
+        },
+        {
+          name: 'donation_amount',
+          label: 'Choose donation amount',
+          type: 'radio',
+          description: 'Choose how much you would like to donate.',
+          required: true,
+          defaultValue: '25',
+          choices: [
+            choice('$25 USD', '25'),
+            choice('$50 USD', '50'),
+            choice('$100 USD', '100'),
+            choice('$500 USD', '500'),
+            choice('Other amount', 'other'),
+          ],
+        },
+        {
+          name: 'other_amount',
+          label: 'Other amount',
+          type: 'number',
+          required: true,
+          conditionalLogic: {
+            enabled: true,
+            field: 'donation_amount',
+            operator: 'equals',
+            value: 'other',
+          },
+        },
+        {
+          name: 'donation_total',
+          label: 'Total',
+          type: 'message',
+          message: 'The final donation total is calculated from the selected amount by the configured CleverPayments integration.',
+        },
+        {
+          name: 'organization_gift',
+          label: 'I would like to give on behalf of an organization.',
+          type: 'radio',
+          required: true,
+          choices: [choice('Yes', 'yes'), choice('No', 'no')],
+        },
+        {
+          name: 'organization_name',
+          label: 'Organization name',
+          type: 'text',
+          required: true,
+          conditionalLogic: {
+            enabled: true,
+            field: 'organization_gift',
+            operator: 'equals',
+            value: 'yes',
+          },
+        },
+        {
+          name: 'dedication',
+          label: 'Would you like to dedicate your gift in honor or memory of someone?',
+          type: 'radio',
+          required: true,
+          choices: [choice('Yes', 'yes'), choice('No', 'no')],
+        },
+        {
+          name: 'dedication_name',
+          label: 'Honoree name',
+          type: 'text',
+          required: true,
+          conditionalLogic: {
+            enabled: true,
+            field: 'dedication',
+            operator: 'equals',
+            value: 'yes',
+          },
+        },
+        {
+          name: 'payment_method_heading',
+          label: 'Payment Method',
+          type: 'heading',
+        },
+        {
+          name: 'payment_form',
+          label: 'Payment Form (Required)',
+          type: 'message',
+          message: 'Secure payment fields are supplied by CleverPayments. Configure a payment provider before publishing this donation form. CleverForms Core does not collect card numbers or banking credentials.',
+        },
+      ], 'Donation'),
+      page([
+        {
+          name: 'your_information_heading',
+          label: 'Your Information',
+          type: 'heading',
+        },
+        { name: 'first_name', label: 'First Name', type: 'text', required: true, width: '50%' },
+        { name: 'last_name', label: 'Last Name', type: 'text', required: true, width: '50%' },
+        { name: 'email', label: 'Email', type: 'email', required: true },
+        { name: 'phone', label: 'Phone', type: 'text' },
+        {
+          name: 'address_heading',
+          label: 'Address',
+          type: 'heading',
+        },
+        { name: 'street_address', label: 'Street Address', type: 'text' },
+        { name: 'city', label: 'City', type: 'text', width: '50%' },
+        { name: 'state', label: 'State', type: 'state', width: '25%' },
+        { name: 'zip_code', label: 'ZIP Code', type: 'text', width: '25%' },
+        {
+          name: 'email_opt_in',
+          label: "I'd like to receive emails from this organization",
+          type: 'checkbox',
+          defaultValue: false,
+        },
+        {
+          name: 'sms_opt_in',
+          label: 'Would you like to receive text messages from this organization?',
+          type: 'radio',
+          choices: [choice('Yes', 'yes'), choice('No', 'no')],
+        },
+      ], 'Your Information'),
+    ],
+    settings: {
+      submitButtonLabel: 'Donate',
+      confirmationType: 'message',
+      successMessage: 'Thank you for your generosity.',
+    },
+  }
 ]
 
 export const getCleverFormTemplate = (key?: string | null) =>

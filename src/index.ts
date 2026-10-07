@@ -10,6 +10,8 @@ export type {
   CleverFormField,
   CleverFormFieldType,
   CleverFormPage,
+  CleverFormNotification,
+  CleverFormsPreparedEmail,
   CleverFormsFieldConfig,
   CleverFormsPluginOptions,
   SubmissionGuardArgs,
@@ -21,6 +23,9 @@ export { CleverFormsValidationError, validateSubmission } from './runtime/valida
 export { CleverFormsSchemaError, validateFormSchema } from './runtime/schemaValidation.js'
 export { createCleverFormsClient } from './runtime/client.js'
 export { getFormDefaultValues, normalizeFieldDefaultValue } from './runtime/defaults.js'
+export { COUNTRY_CODES, COUNTRIES, US_STATES } from './runtime/locations.js'
+export { resolveConfirmationRedirect } from './runtime/confirmation.js'
+export { parseEmailRecipients, prepareNotificationEmails, renderNotificationTemplate } from './runtime/email.js'
 export { cleverFormsTranslations } from './i18n/index.js'
 export { cleverFormTemplates, getCleverFormTemplate, cloneCleverFormTemplate } from './templates/index.js'
 export type { CleverFormTemplate } from './templates/index.js'

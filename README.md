@@ -40,9 +40,9 @@ The current public Core includes:
 | Date | ✓ |
 | Heading | ✓ |
 | Paragraph | ✓ |
-| State | Planned |
-| Country | Planned |
-| Rich message/content block | Planned |
+| State | ✓ |
+| Country | ✓ |
+| Message/display content | ✓ |
 | Upload | Planned |
 | Payment | Separate CleverPayments product |
 
@@ -79,6 +79,10 @@ Conditional rules are evaluated in both the runtime and server-side submission v
 - bundled React renderer for Next.js/Payload applications
 - multi-page Previous / Next navigation
 - runtime conditional visibility
+- State and Country select rendering
+- display-only Message fields
+- custom confirmation messages
+- safe confirmation redirects to relative or http/https URLs
 - client submission helper
 - configurable API base URL and submission collection slug
 - success and error callbacks
@@ -98,9 +102,24 @@ Each submission stores:
 
 The Forms and Submissions collections can both be extended through plugin callbacks.
 
+### Email notifications
+
+Forms can define multiple post-submission email notifications using Payload's configured email adapter.
+
+- multiple recipients
+- configurable Reply-To
+- dynamic subject and body templates
+- field tokens such as `{{email}}`
+- wildcard `{{*}}` submission summaries
+- plugin-level `defaultToEmail` fallback
+- plugin-level `beforeEmail` transformation hook
+- configurable log-or-throw behavior for delivery failures
+
+Basic form notifications are part of Core. Broader campaign, SMS, workflow, and provider automation remain separate CleverForge products.
+
 ### Templates and integration metadata
 
-Core currently includes 12 editable starter templates:
+Core currently includes 13 editable starter templates:
 
 - Newsletter Signup
 - Contact Form
@@ -114,8 +133,11 @@ Core currently includes 12 editable starter templates:
 - Customer Support
 - Support Request
 - Volunteer Application
+- Donation Form
 
 Templates are provider-neutral. They may expose optional metadata such as a CleverConnect Salesforce preset key, but CleverForms does not require Salesforce or CleverConnect.
+
+The Donation Form template includes donation frequency and amount choices, conditional organization and dedication details, donor contact/address fields, and communications preferences. It intentionally does **not** collect card or bank credentials in Core. The payment area is a secure placeholder for a separate CleverPayments integration.
 
 ## Installation
 
@@ -268,7 +290,8 @@ Future authorized MCP tools could expose operations such as `list_forms`, `get_f
 | Signatures | | ✓ |
 | PDF generation | | ✓ |
 | Advanced conditional logic | | ✓ |
-| Email automation | | ✓ |
+| Basic submission email notifications | ✓ | |
+| Advanced email/SMS automation | | ✓ |
 | Webhooks | | ✓ |
 | Salesforce and CRM connectors | | ✓ |
 | AI features | | ✓ |
@@ -294,18 +317,18 @@ The comparison below reflects the current CleverForms Core implementation and th
 | Date | ✓ | ✓ |
 | Multiselect | ✓ | Not listed as a default field |
 | Heading / paragraph display fields | ✓ | Message field instead |
-| State field | Planned | ✓ |
-| Country field | Planned | ✓ |
-| Rich message/content field | Planned | ✓ |
+| State field | ✓ | ✓ |
+| Country field | ✓ | ✓ |
+| Message/content field | ✓ plain-text display | ✓ rich text |
 | Native multi-page page model | ✓ | Not documented as a dedicated page primitive |
 | General field conditional visibility | ✓ basic rules | Not documented as a general built-in field-visibility feature |
 | Field default values | ✓ | ✓ |
 | Field width/layout setting | ✓ width metadata | ✓ |
 | Custom confirmation message | ✓ | ✓ |
-| Redirect after submission | Planned | ✓ |
-| Dynamic submission emails | Planned | ✓ |
-| Multiple email recipients | Planned | ✓ |
-| Email field tokens / wildcard output | Planned | ✓ |
+| Redirect after submission | ✓ URL | ✓ URL / configured relationship |
+| Dynamic submission emails | ✓ text templates | ✓ rich-text templates |
+| Multiple email recipients | ✓ | ✓ |
+| Email field tokens / wildcard output | ✓ `{{field}}`, `{{*}}` | ✓ `{{field}}`, `{{*}}`, `{{*:table}}` |
 | Upload field | Planned | ✓ |
 | Upload MIME / size controls | Planned | ✓ |
 | Payment field / payment callback | Separate CleverPayments product | ✓ optional |
@@ -313,7 +336,7 @@ The comparison below reflects the current CleverForms Core implementation and th
 | Client submission helper | ✓ | No equivalent helper documented |
 | Localized form content | ✓ | Can be composed with Payload localization; not documented as a Form Builder-specific feature |
 | English / Spanish / French runtime strings | ✓ | Not documented as a bundled frontend runtime |
-| Starter template catalog | ✓, 12 templates | No built-in template catalog documented |
+| Starter template catalog | ✓, 13 templates | No built-in template catalog documented |
 | Per-form authentication toggle | ✓ | Can be implemented with collection/access customization |
 | Collection extension hooks | ✓ | ✓ via form and submission overrides |
 | Server-side allow-list validation for choices | ✓ | Submission validation is handled by the plugin |
@@ -353,9 +376,9 @@ Official reference: [Payload Form Builder Plugin documentation](https://payloadc
 - [x] starter template catalog
 - [x] tests and CI foundation
 - [x] field default values and width/layout controls
-- [ ] State, Country, and rich Message fields
-- [ ] confirmation redirects
-- [ ] basic dynamic email notifications
+- [x] State, Country, and Message fields
+- [x] confirmation redirects
+- [x] basic dynamic email notifications
 - [ ] improved Submission Admin presentation
 - [ ] basic Payload-native upload field
 - [ ] richer custom-field extension API

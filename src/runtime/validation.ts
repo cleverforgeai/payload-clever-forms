@@ -1,6 +1,7 @@
 import type { CleverFormDefinition, CleverFormField } from '../types.js'
 import { conditionMatches } from './logic.js'
 import { normalizeFieldDefaultValue } from './defaults.js'
+import { COUNTRY_CODE_SET, US_STATE_CODES } from './locations.js'
 
 export class CleverFormsValidationError extends Error {
   constructor(public readonly errors: Record<string, string>) {
@@ -23,7 +24,7 @@ export const validateSubmission = (
   const errors: Record<string, string> = {}
 
   for (const field of allFields(form)) {
-    if (field.type === 'heading' || field.type === 'paragraph') continue
+    if (field.type === 'heading' || field.type === 'paragraph' || field.type === 'message') continue
     if (!conditionMatches(field.conditionalLogic, input)) continue
 
     const suppliedValue = input[field.name]
@@ -42,6 +43,16 @@ export const validateSubmission = (
 
     if (field.type === 'number' && !Number.isFinite(Number(value))) {
       errors[field.name] = `${field.label} must be a number.`
+      continue
+    }
+
+    if (field.type === 'state' && !US_STATE_CODES.has(String(value))) {
+      errors[field.name] = `${field.label} must be a valid US state.`
+      continue
+    }
+
+    if (field.type === 'country' && !COUNTRY_CODE_SET.has(String(value))) {
+      errors[field.name] = `${field.label} must be a valid country.`
       continue
     }
 

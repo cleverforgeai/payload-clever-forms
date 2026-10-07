@@ -2,7 +2,8 @@ import type { CollectionConfig, PayloadRequest } from 'payload'
 
 export type CleverFormFieldType =
   | 'text' | 'textarea' | 'email' | 'number' | 'select' | 'radio'
-  | 'checkbox' | 'multiselect' | 'date' | 'heading' | 'paragraph'
+  | 'checkbox' | 'multiselect' | 'date' | 'state' | 'country'
+  | 'heading' | 'paragraph' | 'message'
 
 export type CleverFormChoice = { label: string; value: string }
 
@@ -22,6 +23,7 @@ export type CleverFormField = {
   required?: boolean
   defaultValue?: string | number | boolean | string[]
   width?: string
+  message?: string
   choices?: CleverFormChoice[]
   conditionalLogic?: CleverFormCondition
 }
@@ -30,6 +32,21 @@ export type CleverFormPage = {
   title?: string
   description?: string
   fields: CleverFormField[]
+}
+
+export type CleverFormNotification = {
+  enabled?: boolean
+  to?: string
+  replyTo?: string
+  subject?: string
+  body?: string
+}
+
+export type CleverFormsPreparedEmail = {
+  to: string[]
+  replyTo?: string
+  subject: string
+  text: string
 }
 
 export type CleverFormDefinition = {
@@ -42,8 +59,11 @@ export type CleverFormDefinition = {
   pages?: CleverFormPage[]
   settings?: {
     submitButtonLabel?: string
+    confirmationType?: 'message' | 'redirect'
     successMessage?: string
+    redirectURL?: string
     requireAuthentication?: boolean
+    notifications?: CleverFormNotification[]
   }
 }
 
@@ -65,6 +85,12 @@ export type CleverFormsPluginOptions = {
   submissionsSlug?: string
   adminGroup?: string
   fields?: CleverFormsFieldConfig
+  defaultToEmail?: string
+  emailFailureMode?: 'log' | 'throw'
+  beforeEmail?: (
+    email: CleverFormsPreparedEmail,
+    args: SubmissionHandlerArgs,
+  ) => Promise<CleverFormsPreparedEmail | void> | CleverFormsPreparedEmail | void
   extendFormsCollection?: (collection: CollectionConfig) => CollectionConfig
   extendSubmissionsCollection?: (collection: CollectionConfig) => CollectionConfig
   beforeSubmission?: (args: SubmissionGuardArgs) => Promise<void> | void

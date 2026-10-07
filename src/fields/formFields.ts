@@ -4,7 +4,7 @@ import type { CleverFormsFieldConfig } from '../types.js'
 const defaultEnabled = {
   text: true, textarea: true, email: true, number: true, select: true,
   radio: true, checkbox: true, multiselect: true, date: true,
-  heading: true, paragraph: true,
+  state: true, country: true, heading: true, paragraph: true, message: true,
 } as const
 
 export const createFormFields = (config: CleverFormsFieldConfig = {}): Field[] => {
@@ -18,6 +18,15 @@ export const createFormFields = (config: CleverFormsFieldConfig = {}): Field[] =
     { name: 'label', type: 'text', required: true, localized: true },
     { name: 'type', type: 'select', required: true, options: typeOptions },
     { name: 'description', type: 'textarea', localized: true },
+    {
+      name: 'message',
+      label: 'Message Content',
+      type: 'textarea',
+      localized: true,
+      admin: {
+        description: 'Used by the Message field type to display non-input content inside the form.',
+      },
+    },
     { name: 'placeholder', type: 'text', localized: true },
     {
       name: 'defaultValue',
