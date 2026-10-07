@@ -40,10 +40,12 @@ export const createFormFields = (
     option.value !== 'repeater' && option.value !== 'upload'
   )
 
+  const customTypeNames = customFieldTypes.map((field) => field.type)
   const inputTypes = [
     'text', 'textarea', 'email', 'number', 'select', 'radio', 'checkbox',
     'multiselect', 'date', 'datetime', 'time', 'url', 'phone', 'range',
     'state', 'country', 'upload', 'repeater',
+    ...customTypeNames,
   ]
   const placeholderTypes = ['text', 'textarea', 'email', 'number', 'url', 'phone']
   const choiceTypes = ['select', 'radio', 'checkbox', 'multiselect']
