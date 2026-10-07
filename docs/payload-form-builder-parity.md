@@ -42,7 +42,7 @@ These should remain first-class CleverForms Core features.
 | State | Yes | Yes | Implemented in Core |
 | Country | Yes | Yes | Implemented in Core |
 | Message/content block | Yes | Yes | Implemented in Core |
-| Upload | Yes | No | Add basic Payload-native upload to Core; private/secure storage remains PRO |
+| Upload | Yes | Yes | Basic Payload-native upload is now in Core; private/secure storage remains PRO |
 | Payment field | Optional | No | Do not copy into Core. Provide extension points for CleverPayments |
 | Field default value | Yes | Yes | Implemented in Core |
 | Field width/layout | Yes | Yes, width metadata | Implemented in Core |
@@ -55,7 +55,7 @@ These should remain first-class CleverForms Core features.
 | Submission collection overrides | Yes | Yes through extension callbacks | Keep |
 | Submission authorship | Yes by default | No explicit authorship | Evaluate for Core |
 | Payment callback | Yes | No | Expose neutral extension hook; payment implementation belongs to CleverPayments |
-| Upload MIME/size restrictions | Yes | No | Add to Core upload field |
+| Upload MIME/size restrictions | Yes | Yes | Implemented in Core |
 | Custom field extension | Yes | Limited to enable/disable known field types | Expand field-definition extension API |
 
 ## Core parity milestone
@@ -74,8 +74,8 @@ The next Core milestone should close the gaps administrators notice immediately 
    - submission field tokens
    - wildcard summary token
    - default recipient fallback and before-send transformation hook
-5. [ ] Improve submission administration so staff can read submitted values without opening raw JSON.
-6. [ ] Add basic Payload-native upload field support:
+5. [x] Improve submission administration so staff can read submitted values without opening raw JSON.
+6. [x] Add basic Payload-native upload field support:
    - configured upload collection
    - MIME restrictions
    - max file size
@@ -157,8 +157,8 @@ CleverForms Core should not be declared 1.0 until:
 1. [x] Field metadata parity: default values, width, State, Country, Message
 2. [x] Confirmation redirect
 3. [x] Basic email notifications
-4. [ ] Submission Admin improvements
-5. [ ] Basic upload field
+4. [x] Submission Admin improvements
+5. [x] Basic upload field
 6. [ ] Builder UX improvements
 7. [ ] integration/accessibility test expansion
 
