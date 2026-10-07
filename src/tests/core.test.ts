@@ -4,6 +4,8 @@ import { conditionMatches } from '../runtime/logic.js'
 import { CleverFormsValidationError, validateSubmission } from '../runtime/validation.js'
 import { CleverFormsSchemaError, validateFormSchema } from '../runtime/schemaValidation.js'
 import { getFormDefaultValues } from '../runtime/defaults.js'
+import { prepareNotificationEmails, renderNotificationTemplate } from '../runtime/email.js'
+import { resolveConfirmationRedirect } from '../runtime/confirmation.js'
 import type { CleverFormDefinition } from '../types.js'
 
 const form: CleverFormDefinition = {
@@ -85,6 +87,7 @@ test('pre-built template catalog includes administrator starter forms without th
     'customer-support',
     'support-request',
     'volunteer-application',
+    'donation-form',
   ]) {
     assert.ok(keys.includes(key), `missing template ${key}`)
   }
@@ -137,4 +140,94 @@ test('server validation applies configured defaults when a value is omitted', ()
   }
 
   assert.deepEqual(validateSubmission(defaultsForm, {}), { name: 'Jane', count: 3 })
+})
+
+
+test('State and Country fields validate known location codes', () => {
+  const locationForm: CleverFormDefinition = {
+    id: 'locations',
+    title: 'Locations',
+    pages: [{
+      fields: [
+        { name: 'state', label: 'State', type: 'state', required: true },
+        { name: 'country', label: 'Country', type: 'country', required: true },
+        { name: 'note', label: 'Note', type: 'message', message: 'Display only' },
+      ],
+    }],
+  }
+
+  assert.deepEqual(validateSubmission(locationForm, { state: 'PA', country: 'US', note: 'forged' }), {
+    state: 'PA',
+    country: 'US',
+  })
+
+  assert.throws(
+    () => validateSubmission(locationForm, { state: 'XX', country: 'US' }),
+    CleverFormsValidationError,
+  )
+  assert.throws(
+    () => validateSubmission(locationForm, { state: 'PA', country: 'XX' }),
+    CleverFormsValidationError,
+  )
+})
+
+test('confirmation redirects allow relative and http/https URLs only', () => {
+  assert.equal(
+    resolveConfirmationRedirect('/thank-you', 'https://example.org/donate'),
+    'https://example.org/thank-you',
+  )
+  assert.equal(
+    resolveConfirmationRedirect('https://example.net/thanks', 'https://example.org'),
+    'https://example.net/thanks',
+  )
+  assert.equal(resolveConfirmationRedirect('javascript:alert(1)', 'https://example.org'), undefined)
+})
+
+test('notification templates render fields, wildcard output, recipients, and reply-to', () => {
+  const emailForm: CleverFormDefinition = {
+    id: 'email-form',
+    title: 'Email Form',
+    pages: [{ fields: [{ name: 'email', label: 'Email', type: 'email' }] }],
+    settings: {
+      notifications: [{
+        enabled: true,
+        to: 'team@example.org, {{email}}',
+        replyTo: '{{email}}',
+        subject: 'Submission from {{name}}',
+        body: 'Name: {{name}}\n\n{{*}}',
+      }],
+    },
+  }
+
+  const emails = prepareNotificationEmails(emailForm, {
+    email: 'person@example.org',
+    name: 'Jane',
+  })
+
+  assert.equal(emails.length, 1)
+  assert.deepEqual(emails[0].to, ['team@example.org', 'person@example.org'])
+  assert.equal(emails[0].replyTo, 'person@example.org')
+  assert.equal(emails[0].subject, 'Submission from Jane')
+  assert.match(emails[0].text, /email: person@example.org/)
+  assert.match(emails[0].text, /name: Jane/)
+  assert.equal(renderNotificationTemplate('Hello {{name}}', { name: 'Jane' }), 'Hello Jane')
+})
+
+test('Donation Form template includes donation choices, payment placeholder, and donor information', async () => {
+  const { getCleverFormTemplate } = await import('../templates/index.js')
+  const template = getCleverFormTemplate('donation-form')
+  assert.ok(template)
+
+  const fields = template.pages.flatMap((page) => page.fields)
+  const byName = new Map(fields.map((field) => [field.name, field]))
+
+  assert.equal(byName.get('donation_frequency')?.required, true)
+  assert.equal(byName.get('donation_amount')?.defaultValue, '25')
+  assert.equal(byName.get('payment_form')?.type, 'message')
+  assert.equal(byName.get('first_name')?.required, true)
+  assert.equal(byName.get('last_name')?.required, true)
+  assert.equal(byName.get('email')?.required, true)
+  assert.equal(byName.get('state')?.type, 'state')
+  assert.equal(byName.get('email_opt_in')?.type, 'checkbox')
+  assert.equal(byName.get('sms_opt_in')?.type, 'radio')
 })
