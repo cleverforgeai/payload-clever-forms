@@ -33,6 +33,7 @@ export { parseEmailRecipients, prepareNotificationEmails, renderNotificationTemp
 export { cleverFormsTranslations } from './i18n/index.js'
 export { cleverFormTemplates, getCleverFormTemplate, cloneCleverFormTemplate } from './templates/index.js'
 export { cleverFormRelationship } from './helpers/relationship.js'
+export { defineCleverFormFieldGroup, insertCleverFormFieldGroup } from './helpers/fieldGroups.js'
 export type { CleverFormRelationshipOptions } from './helpers/relationship.js'
 export type { CleverFormTemplate } from './templates/index.js'
 
