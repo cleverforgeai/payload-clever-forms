@@ -35,7 +35,7 @@ export type CleverFormField = {
   max?: number
   step?: number
   choices?: CleverFormChoice[]
-  fields?: CleverFormField[]
+  repeaterFields?: CleverFormField[]
   minRows?: number
   maxRows?: number
   conditionalLogic?: CleverFormCondition
