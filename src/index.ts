@@ -9,6 +9,7 @@ export type {
   CleverFormDefinition,
   CleverFormField,
   CleverFormFieldType,
+  CleverFormFieldTypeName,
   CleverFormPage,
   CleverFormNotification,
   CleverFormsPreparedEmail,
