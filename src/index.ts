@@ -39,7 +39,12 @@ export const cleverForms = definePlugin<CleverFormsPluginOptions>({
     const submissionsSlug = options.submissionsSlug ?? 'clever-form-submissions'
     const adminGroup = options.adminGroup ?? 'Clever Forms'
 
-    let forms = createFormsCollection(formsSlug, adminGroup, options.fields)
+    let forms = createFormsCollection(
+      formsSlug,
+      adminGroup,
+      options.fields,
+      options.uploadCollections ?? [],
+    )
     let submissions = createSubmissionsCollection(submissionsSlug, formsSlug, adminGroup, options)
 
     if (options.extendFormsCollection) forms = options.extendFormsCollection(forms)
