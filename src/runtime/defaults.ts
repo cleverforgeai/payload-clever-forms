@@ -35,7 +35,7 @@ const getFieldDefault = (field: CleverFormField): unknown => {
 
     return Array.from({ length: rowCount }, () => {
       const row: Record<string, unknown> = {}
-      for (const child of field.fields ?? []) {
+      for (const child of field.repeaterFields ?? []) {
         const childValue = getFieldDefault(child)
         if (childValue !== undefined) row[child.name] = childValue
       }
