@@ -1,6 +1,7 @@
 import type { CollectionAfterChangeHook, CollectionBeforeChangeHook } from 'payload'
 import type { CleverFormDefinition, CleverFormsPluginOptions } from '../types.js'
 import { validateSubmission } from './validation.js'
+import { sendFormNotifications } from './email.js'
 
 export const createSubmissionHook = (
   formsSlug: string,
@@ -30,11 +31,15 @@ export const createAfterSubmissionHook = (
   formsSlug: string,
   options: CleverFormsPluginOptions,
 ): CollectionAfterChangeHook => async ({ doc, operation, req }) => {
-  if (operation !== 'create' || !options.onSubmission) return doc
+  if (operation !== 'create') return doc
 
   const formID = typeof doc.form === 'object' && doc.form !== null ? doc.form.id : doc.form
   const form = await req.payload.findByID({ collection: formsSlug, id: formID, depth: 0, req }) as unknown as CleverFormDefinition
-  await options.onSubmission({ form, data: (doc.data ?? {}) as Record<string, unknown>, req })
+  const data = (doc.data ?? {}) as Record<string, unknown>
+  const args = { form, data, req }
+
+  await sendFormNotifications(form, data, args, options)
+  if (options.onSubmission) await options.onSubmission(args)
 
   return doc
 }
