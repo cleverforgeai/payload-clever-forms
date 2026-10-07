@@ -39,18 +39,18 @@ These should remain first-class CleverForms Core features.
 | Radio | Yes | Yes | Keep |
 | Checkbox | Yes | Yes | Keep |
 | Date | Supported | Yes | Keep |
-| State | Yes | No dedicated type | Add to Core |
-| Country | Yes | No dedicated type | Add to Core |
-| Message/content block | Yes | Heading + paragraph only | Add richer Core message block |
+| State | Yes | Yes | Implemented in Core |
+| Country | Yes | Yes | Implemented in Core |
+| Message/content block | Yes | Yes | Implemented in Core |
 | Upload | Yes | No | Add basic Payload-native upload to Core; private/secure storage remains PRO |
 | Payment field | Optional | No | Do not copy into Core. Provide extension points for CleverPayments |
-| Field default value | Yes | No general field property | Add to Core |
-| Field width/layout | Yes | No | Add to Core |
+| Field default value | Yes | Yes | Implemented in Core |
+| Field width/layout | Yes | Yes, width metadata | Implemented in Core |
 | Confirmation message | Yes | Yes | Keep and improve |
-| Redirect after submit | Yes | No | Add to Core |
-| Multiple dynamic notification emails | Yes | No | Add basic Payload-email notifications to Core |
-| Email field tokens | Yes | No | Add to Core |
-| Wildcard submission output in email | Yes | No | Add to Core |
+| Redirect after submit | Yes | Yes, URL redirect | Implemented in Core |
+| Multiple dynamic notification emails | Yes | Yes | Implemented in Core using Payload email adapter |
+| Email field tokens | Yes | Yes | Implemented in Core |
+| Wildcard submission output in email | Yes | Yes | Implemented in Core |
 | Form collection overrides | Yes | Yes through extension callbacks | Keep |
 | Submission collection overrides | Yes | Yes through extension callbacks | Keep |
 | Submission authorship | Yes by default | No explicit authorship | Evaluate for Core |
@@ -64,24 +64,18 @@ The next Core milestone should close the gaps administrators notice immediately 
 
 ### P0 — Administrator and runtime parity
 
-1. Add field-level:
-   - default value
-   - width
-2. Add:
-   - State field
-   - Country field
-   - Message/content field
-3. Add submit confirmation behavior:
-   - show message
-   - redirect to URL
-   - optional relationship-based redirect through collection extension
-4. Add basic notification emails using Payload's configured email adapter:
+1. [x] Add field-level default value and width metadata.
+2. [x] Add State, Country, and Message/content fields.
+3. [x] Add submit confirmation message and URL redirect behavior.
+   - relationship-based redirects remain available through collection/application extension rather than Core coupling
+4. [x] Add basic notification emails using Payload's configured email adapter:
    - multiple recipients
    - subject/body templates
    - submission field tokens
    - wildcard summary token
-5. Improve submission administration so staff can read submitted values without opening raw JSON.
-6. Add basic Payload-native upload field support:
+   - default recipient fallback and before-send transformation hook
+5. [ ] Improve submission administration so staff can read submitted values without opening raw JSON.
+6. [ ] Add basic Payload-native upload field support:
    - configured upload collection
    - MIME restrictions
    - max file size
@@ -160,12 +154,12 @@ CleverForms Core should not be declared 1.0 until:
 
 ## Recommended implementation order
 
-1. Field metadata parity: default values, width, State, Country, Message
-2. Confirmation redirect
-3. Basic email notifications
-4. Submission Admin improvements
-5. Basic upload field
-6. Builder UX improvements
-7. integration/accessibility test expansion
+1. [x] Field metadata parity: default values, width, State, Country, Message
+2. [x] Confirmation redirect
+3. [x] Basic email notifications
+4. [ ] Submission Admin improvements
+5. [ ] Basic upload field
+6. [ ] Builder UX improvements
+7. [ ] integration/accessibility test expansion
 
 This order improves the day-to-day administrator experience first while preserving the modular CleverForge product architecture.
