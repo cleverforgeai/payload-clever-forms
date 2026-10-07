@@ -6,7 +6,9 @@ const allFields = (form: CleverFormDefinition): CleverFormField[] =>
 const displayValue = (value: unknown): string => {
   if (value === undefined || value === null || value === '') return ''
   if (Array.isArray(value)) return value.map(displayValue).filter(Boolean).join(', ')
-  if (typeof value === 'object') return JSON.stringify(value)
+  if (typeof value === 'object') return Object.entries(value as Record<string, unknown>)
+    .map(([key, nested]) => `${key}: ${displayValue(nested)}`)
+    .join('; ')
   return String(value)
 }
 
