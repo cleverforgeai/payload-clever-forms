@@ -70,7 +70,7 @@ const validateFields = (
           continue
         }
         rows.push(validateFields(
-          field.fields ?? [],
+          field.repeaterFields ?? [],
           row as Record<string, unknown>,
           errors,
           customFieldTypes,
