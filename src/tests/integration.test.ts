@@ -68,7 +68,7 @@ test('Clever Forms installs into Payload and validates real Local API writes', a
               type: 'repeater',
               minRows: 1,
               maxRows: 3,
-              fields: [
+              repeaterFields: [
                 { name: 'name', label: 'Name', type: 'text', required: true },
                 { name: 'relationship', label: 'Relationship', type: 'text' },
               ],
