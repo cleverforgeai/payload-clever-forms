@@ -14,7 +14,7 @@ export const cleverFormRelationship = (
 ): Field => ({
   name: options.name,
   type: 'relationship',
-  relationTo: options.formsSlug ?? 'clever-forms',
+  relationTo: (options.formsSlug ?? 'clever-forms') as any,
   label: options.label,
   hasMany: options.hasMany ?? false,
   required: options.required ?? false,
