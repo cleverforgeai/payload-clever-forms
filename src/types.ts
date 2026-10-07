@@ -6,6 +6,8 @@ export type CleverFormFieldType =
   | 'range' | 'state' | 'country' | 'upload' | 'repeater'
   | 'heading' | 'paragraph' | 'message'
 
+export type CleverFormFieldTypeName = CleverFormFieldType | (string & Record<never, never>)
+
 export type CleverFormChoice = { label: string; value: string }
 
 export type CleverFormCondition = {
@@ -18,7 +20,7 @@ export type CleverFormCondition = {
 export type CleverFormField = {
   name: string
   label: string
-  type: CleverFormFieldType
+  type: CleverFormFieldTypeName
   description?: string
   placeholder?: string
   required?: boolean
