@@ -92,7 +92,7 @@ const Field = ({
     return <div>
       {rows.map((row, index) => <fieldset key={index}>
         <legend>{field.label} {index + 1}</legend>
-        {(field.fields ?? []).map((child) => <div key={child.name}>
+        {(field.repeaterFields ?? []).map((child) => <div key={child.name}>
           {!['heading', 'paragraph', 'message', 'radio'].includes(child.type)
             ? <label htmlFor={`${inputName}.${index}.${child.name}`}>{child.label}</label>
             : null}
