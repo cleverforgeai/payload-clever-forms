@@ -20,6 +20,8 @@ export type CleverFormField = {
   description?: string
   placeholder?: string
   required?: boolean
+  defaultValue?: string | number | boolean | string[]
+  width?: string
   choices?: CleverFormChoice[]
   conditionalLogic?: CleverFormCondition
 }

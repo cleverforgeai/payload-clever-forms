@@ -1,5 +1,6 @@
 import type { CleverFormDefinition, CleverFormField } from '../types.js'
 import { conditionMatches } from './logic.js'
+import { normalizeFieldDefaultValue } from './defaults.js'
 
 export class CleverFormsValidationError extends Error {
   constructor(public readonly errors: Record<string, string>) {
@@ -25,7 +26,9 @@ export const validateSubmission = (
     if (field.type === 'heading' || field.type === 'paragraph') continue
     if (!conditionMatches(field.conditionalLogic, input)) continue
 
-    const value = input[field.name]
+    const suppliedValue = input[field.name]
+    const defaultValue = normalizeFieldDefaultValue(field)
+    const value = isEmpty(suppliedValue) && defaultValue !== undefined ? defaultValue : suppliedValue
     if (field.required && isEmpty(value)) {
       errors[field.name] = `${field.label} is required.`
       continue

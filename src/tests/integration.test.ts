@@ -39,7 +39,7 @@ test('Clever Forms installs into Payload and validates real Local API writes', a
         pages: [{
           fields: [
             { name: 'email', label: 'Email', type: 'email', required: true },
-            { name: 'role', label: 'Role', type: 'select', choices: [{ label: 'Member', value: 'member' }] },
+            { name: 'role', label: 'Role', type: 'select', defaultValue: 'member', width: '50%', choices: [{ label: 'Member', value: 'member' }] },
           ],
         }],
       },
@@ -65,7 +65,7 @@ test('Clever Forms installs into Payload and validates real Local API writes', a
       collection: 'clever-form-submissions',
       data: {
         form: form.id,
-        data: { email: 'integration@example.org', role: 'member', injected: 'removed' },
+        data: { email: 'integration@example.org', injected: 'removed' },
       },
     })
 
