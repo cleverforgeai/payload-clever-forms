@@ -13,6 +13,8 @@ export type {
   CleverFormNotification,
   CleverFormsPreparedEmail,
   CleverFormsFieldConfig,
+  CleverFormFieldGroup,
+  CleverFormsCustomFieldDefinition,
   CleverFormsPluginOptions,
   SubmissionGuardArgs,
   SubmissionHandlerArgs,
@@ -48,6 +50,7 @@ export const cleverForms = definePlugin<CleverFormsPluginOptions>({
       adminGroup,
       options.fields,
       options.uploadCollections ?? [],
+      options.customFieldTypes ?? [],
     )
     let submissions = createSubmissionsCollection(submissionsSlug, formsSlug, adminGroup, options)
 
