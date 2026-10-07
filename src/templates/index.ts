@@ -216,7 +216,6 @@ export const cleverFormTemplates: CleverFormTemplate[] = [
     ], 'Volunteer Application')],
     settings: { submitButtonLabel: 'Send Application', successMessage: 'Thanks! A coordinator will be in touch.' },
   },
-,
   {
     key: 'donation-form',
     title: 'Donation Form',
