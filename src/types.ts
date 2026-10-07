@@ -3,7 +3,8 @@ import type { CollectionConfig, PayloadRequest } from 'payload'
 export type CleverFormFieldType =
   | 'text' | 'textarea' | 'email' | 'number' | 'select' | 'radio'
   | 'checkbox' | 'multiselect' | 'date' | 'datetime' | 'time' | 'url' | 'phone'
-  | 'range' | 'state' | 'country' | 'upload' | 'heading' | 'paragraph' | 'message'
+  | 'range' | 'state' | 'country' | 'upload' | 'repeater'
+  | 'heading' | 'paragraph' | 'message'
 
 export type CleverFormChoice = { label: string; value: string }
 
@@ -32,6 +33,9 @@ export type CleverFormField = {
   max?: number
   step?: number
   choices?: CleverFormChoice[]
+  fields?: CleverFormField[]
+  minRows?: number
+  maxRows?: number
   conditionalLogic?: CleverFormCondition
 }
 
@@ -76,6 +80,23 @@ export type CleverFormDefinition = {
 
 export type CleverFormsFieldConfig = Partial<Record<CleverFormFieldType, boolean>>
 
+export type CleverFormFieldGroup = {
+  key: string
+  label: string
+  description?: string
+  fields: CleverFormField[]
+}
+
+export type CleverFormsCustomFieldDefinition = {
+  type: string
+  label: string
+  validate?: (args: {
+    field: CleverFormField
+    value: unknown
+    input: Record<string, unknown>
+  }) => string | void
+}
+
 export type SubmissionHandlerArgs = {
   form: CleverFormDefinition
   data: Record<string, unknown>
@@ -93,6 +114,7 @@ export type CleverFormsPluginOptions = {
   adminGroup?: string
   fields?: CleverFormsFieldConfig
   uploadCollections?: string[]
+  customFieldTypes?: CleverFormsCustomFieldDefinition[]
   defaultToEmail?: string
   emailFailureMode?: 'log' | 'throw'
   beforeEmail?: (
