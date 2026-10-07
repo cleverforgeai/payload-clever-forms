@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.3.0-beta.4 - 2026-10-06
+
+### Builder UX and field catalog
+
+- hide builder settings that do not apply to the selected field type
+- add URL, Phone, Date & Time, Time, and Range fields
+- add minimum, maximum, and step metadata for numeric/range inputs
+- add server-side URL protocol validation and numeric min/max validation
+- add reusable `cleverFormRelationship()` helper for attaching CleverForms to other Payload collections
+- expand unit coverage for the new field types and relationship helper
+
 ## 0.3.0-beta.3 - 2026-10-06
 
 ### Submission Admin
