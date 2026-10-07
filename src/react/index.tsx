@@ -4,6 +4,7 @@ import React, { type FormEvent, useMemo, useState } from 'react'
 import type { CleverFormDefinition, CleverFormField } from '../types.js'
 import { conditionMatches } from '../runtime/logic.js'
 import { createCleverFormsClient } from '../runtime/client.js'
+import { getFormDefaultValues } from '../runtime/defaults.js'
 
 export type CleverFormProps = {
   form: CleverFormDefinition
@@ -36,7 +37,10 @@ const Field = ({ field, value, onChange }: { field: CleverFormField; value: unkn
 export const CleverForm = ({ form, apiURL, submissionsSlug, className, initialValues = {}, onSuccess, onError }: CleverFormProps) => {
   const pages = useMemo(() => form.pages ?? [], [form.pages])
   const [pageIndex, setPageIndex] = useState(0)
-  const [values, setValues] = useState<Record<string, unknown>>(initialValues)
+  const [values, setValues] = useState<Record<string, unknown>>(() => ({
+    ...getFormDefaultValues(form),
+    ...initialValues,
+  }))
   const [submitting, setSubmitting] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState<string>()
@@ -77,7 +81,7 @@ export const CleverForm = ({ form, apiURL, submissionsSlug, className, initialVa
   return <form className={className} onSubmit={submit}>
     {page.title ? <h2>{page.title}</h2> : null}
     {page.description ? <p>{page.description}</p> : null}
-    {visibleFields.map((field) => <div key={field.name}>
+    {visibleFields.map((field) => <div key={field.name} style={field.width ? { width: field.width } : undefined}>
       {field.type !== 'heading' && field.type !== 'paragraph' ? <label htmlFor={field.name}>{field.label}</label> : null}
       {field.description && field.type !== 'paragraph' ? <p>{field.description}</p> : null}
       <Field field={field} value={values[field.name]} onChange={(value) => setValues((current) => ({ ...current, [field.name]: value }))} />
