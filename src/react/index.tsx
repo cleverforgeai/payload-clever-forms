@@ -1,6 +1,6 @@
 'use client'
 
-import React, { type FormEvent, useMemo, useState } from 'react'
+import React, { type FormEvent, type ReactNode, useMemo, useState } from 'react'
 import type { CleverFormDefinition, CleverFormField } from '../types.js'
 import { conditionMatches } from '../runtime/logic.js'
 import { createCleverFormsClient } from '../runtime/client.js'
@@ -16,39 +16,57 @@ export type CleverFormProps = {
   initialValues?: Record<string, unknown>
   onSuccess?: (result: unknown) => void
   onError?: (error: Error) => void
+  renderCustomField?: (args: {
+    field: CleverFormField
+    value: unknown
+    onChange: (value: unknown) => void
+    inputName: string
+  }) => ReactNode
 }
 
 const scalar = (value: unknown): string | number =>
   typeof value === 'string' || typeof value === 'number' ? value : ''
 
-const Field = ({ field, value, onChange }: { field: CleverFormField; value: unknown; onChange: (value: unknown) => void }) => {
+const Field = ({
+  field,
+  value,
+  onChange,
+  inputName = field.name,
+  renderCustomField,
+}: {
+  field: CleverFormField
+  value: unknown
+  onChange: (value: unknown) => void
+  inputName?: string
+  renderCustomField?: CleverFormProps['renderCustomField']
+}) => {
   if (field.type === 'heading') return <h3>{field.label}</h3>
   if (field.type === 'paragraph') return <p>{field.description ?? field.label}</p>
   if (field.type === 'message') return <div role="note">{field.message ?? field.description ?? field.label}</div>
 
-  if (field.type === 'textarea') return <textarea id={field.name} name={field.name} value={scalar(value)} placeholder={field.placeholder} required={field.required} onChange={(e) => onChange(e.currentTarget.value)} />
+  if (field.type === 'textarea') return <textarea id={inputName} name={inputName} value={scalar(value)} placeholder={field.placeholder} required={field.required} onChange={(e) => onChange(e.currentTarget.value)} />
 
   if (field.type === 'select') {
-    return <select id={field.name} name={field.name} value={scalar(value)} required={field.required} onChange={(e) => onChange(e.currentTarget.value)}><option value="">Select...</option>{field.choices?.map((choice) => <option key={choice.value} value={choice.value}>{choice.label}</option>)}</select>
+    return <select id={inputName} name={inputName} value={scalar(value)} required={field.required} onChange={(e) => onChange(e.currentTarget.value)}><option value="">Select...</option>{field.choices?.map((choice) => <option key={choice.value} value={choice.value}>{choice.label}</option>)}</select>
   }
 
   if (field.type === 'state' || field.type === 'country') {
     const options = field.type === 'state' ? US_STATES : COUNTRIES
-    return <select id={field.name} name={field.name} value={scalar(value)} required={field.required} onChange={(e) => onChange(e.currentTarget.value)}><option value="">Select...</option>{options.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select>
+    return <select id={inputName} name={inputName} value={scalar(value)} required={field.required} onChange={(e) => onChange(e.currentTarget.value)}><option value="">Select...</option>{options.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select>
   }
 
-  if (field.type === 'radio') return <div>{field.choices?.map((choice) => <label key={choice.value}><input type="radio" name={field.name} value={choice.value} checked={value === choice.value} required={field.required} onChange={() => onChange(choice.value)} />{choice.label}</label>)}</div>
+  if (field.type === 'radio') return <div>{field.choices?.map((choice) => <label key={choice.value}><input type="radio" name={inputName} value={choice.value} checked={value === choice.value} required={field.required} onChange={() => onChange(choice.value)} />{choice.label}</label>)}</div>
   if (field.type === 'checkbox' && field.choices?.length) {
     const values = Array.isArray(value) ? value.map(String) : []
-    return <div>{field.choices.map((choice) => <label key={choice.value}><input type="checkbox" name={field.name} value={choice.value} checked={values.includes(choice.value)} onChange={(e) => onChange(e.currentTarget.checked ? [...values, choice.value] : values.filter((item) => item !== choice.value))} />{choice.label}</label>)}</div>
+    return <div>{field.choices.map((choice) => <label key={choice.value}><input type="checkbox" name={inputName} value={choice.value} checked={values.includes(choice.value)} onChange={(e) => onChange(e.currentTarget.checked ? [...values, choice.value] : values.filter((item) => item !== choice.value))} />{choice.label}</label>)}</div>
   }
-  if (field.type === 'checkbox') return <input id={field.name} type="checkbox" name={field.name} checked={Boolean(value)} required={field.required} onChange={(e) => onChange(e.currentTarget.checked)} />
-  if (field.type === 'multiselect') return <select id={field.name} multiple name={field.name} value={Array.isArray(value) ? value.map(String) : []} required={field.required} onChange={(e) => onChange(Array.from(e.currentTarget.selectedOptions).map((option) => option.value))}>{field.choices?.map((choice) => <option key={choice.value} value={choice.value}>{choice.label}</option>)}</select>
+  if (field.type === 'checkbox') return <input id={inputName} type="checkbox" name={inputName} checked={Boolean(value)} required={field.required} onChange={(e) => onChange(e.currentTarget.checked)} />
+  if (field.type === 'multiselect') return <select id={inputName} multiple name={inputName} value={Array.isArray(value) ? value.map(String) : []} required={field.required} onChange={(e) => onChange(Array.from(e.currentTarget.selectedOptions).map((option) => option.value))}>{field.choices?.map((choice) => <option key={choice.value} value={choice.value}>{choice.label}</option>)}</select>
   if (field.type === 'upload') {
     return <input
-      id={field.name}
+      id={inputName}
       type="file"
-      name={field.name}
+      name={inputName}
       required={field.required}
       multiple={field.multiple}
       accept={field.mimeTypes || undefined}
@@ -58,6 +76,61 @@ const Field = ({ field, value, onChange }: { field: CleverFormField; value: unkn
       }}
     />
   }
+  if (field.type === 'repeater') {
+    const rows = Array.isArray(value) ? value as Array<Record<string, unknown>> : []
+    const minRows = field.minRows ?? (field.required ? 1 : 0)
+    const canAdd = field.maxRows === undefined || rows.length < field.maxRows
+    const canRemove = rows.length > minRows
+
+    const updateRow = (index: number, childName: string, childValue: unknown) => {
+      const next = rows.map((row, rowIndex) =>
+        rowIndex === index ? { ...row, [childName]: childValue } : row
+      )
+      onChange(next)
+    }
+
+    return <div>
+      {rows.map((row, index) => <fieldset key={index}>
+        <legend>{field.label} {index + 1}</legend>
+        {(field.fields ?? []).map((child) => <div key={child.name}>
+          {!['heading', 'paragraph', 'message', 'radio'].includes(child.type)
+            ? <label htmlFor={`${inputName}.${index}.${child.name}`}>{child.label}</label>
+            : null}
+          {child.type === 'radio' ? <div>{child.label}</div> : null}
+          {child.description && !['paragraph', 'message'].includes(child.type)
+            ? <p>{child.description}</p>
+            : null}
+          <Field
+            field={child}
+            value={row[child.name]}
+            inputName={`${inputName}.${index}.${child.name}`}
+            renderCustomField={renderCustomField}
+            onChange={(childValue) => updateRow(index, child.name, childValue)}
+          />
+        </div>)}
+        <button
+          type="button"
+          disabled={!canRemove}
+          onClick={() => onChange(rows.filter((_row, rowIndex) => rowIndex !== index))}
+        >
+          Remove
+        </button>
+      </fieldset>)}
+      <button
+        type="button"
+        disabled={!canAdd}
+        onClick={() => onChange([...rows, {}])}
+      >
+        Add {field.label}
+      </button>
+    </div>
+  }
+
+  const coreInputTypes = new Set(['text', 'email', 'number', 'range', 'date', 'datetime', 'time', 'url', 'phone'])
+  if (!coreInputTypes.has(String(field.type)) && renderCustomField) {
+    return <>{renderCustomField({ field, value, onChange, inputName })}</>
+  }
+
   const inputType =
     field.type === 'email' ? 'email'
       : field.type === 'number' ? 'number'
@@ -70,9 +143,9 @@ const Field = ({ field, value, onChange }: { field: CleverFormField; value: unkn
       : 'text'
 
   return <input
-    id={field.name}
+    id={inputName}
     type={inputType}
-    name={field.name}
+    name={inputName}
     value={scalar(value)}
     placeholder={field.placeholder}
     required={field.required}
@@ -87,7 +160,7 @@ const Field = ({ field, value, onChange }: { field: CleverFormField; value: unkn
   />
 }
 
-export const CleverForm = ({ form, apiURL, submissionsSlug, className, initialValues = {}, onSuccess, onError }: CleverFormProps) => {
+export const CleverForm = ({ form, apiURL, submissionsSlug, className, initialValues = {}, onSuccess, onError, renderCustomField }: CleverFormProps) => {
   const pages = useMemo(() => form.pages ?? [], [form.pages])
   const [pageIndex, setPageIndex] = useState(0)
   const [values, setValues] = useState<Record<string, unknown>>(() => ({
@@ -149,7 +222,12 @@ export const CleverForm = ({ form, apiURL, submissionsSlug, className, initialVa
       {!['heading', 'paragraph', 'message', 'radio'].includes(field.type) ? <label htmlFor={field.name}>{field.label}</label> : null}
       {field.type === 'radio' ? <div>{field.label}</div> : null}
       {field.description && !['paragraph', 'message'].includes(field.type) ? <p>{field.description}</p> : null}
-      <Field field={field} value={values[field.name]} onChange={(value) => setValues((current) => ({ ...current, [field.name]: value }))} />
+      <Field
+        field={field}
+        value={values[field.name]}
+        renderCustomField={renderCustomField}
+        onChange={(value) => setValues((current) => ({ ...current, [field.name]: value }))}
+      />
     </div>)}
     {error ? <p role="alert">{error}</p> : null}
     <div>
