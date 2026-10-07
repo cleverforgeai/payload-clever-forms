@@ -206,6 +206,7 @@ export const createFormFields = (
       {
         name: 'conditionalLogic',
         type: 'group',
+        dbName: 'cond',
         admin: { condition: typeIs(...availableInputTypes) },
         fields: [
           { name: 'enabled', type: 'checkbox', defaultValue: false },
@@ -213,6 +214,7 @@ export const createFormFields = (
           {
             name: 'operator',
             type: 'select',
+            dbName: 'op',
             defaultValue: 'equals',
             options: ['equals', 'notEquals', 'contains', 'isEmpty', 'isNotEmpty'],
           },
