@@ -58,7 +58,33 @@ const Field = ({ field, value, onChange }: { field: CleverFormField; value: unkn
       }}
     />
   }
-  return <input id={field.name} type={field.type === 'email' ? 'email' : field.type === 'number' ? 'number' : field.type === 'date' ? 'date' : 'text'} name={field.name} value={scalar(value)} placeholder={field.placeholder} required={field.required} onChange={(e) => onChange(field.type === 'number' ? e.currentTarget.valueAsNumber : e.currentTarget.value)} />
+  const inputType =
+    field.type === 'email' ? 'email'
+      : field.type === 'number' ? 'number'
+      : field.type === 'range' ? 'range'
+      : field.type === 'date' ? 'date'
+      : field.type === 'datetime' ? 'datetime-local'
+      : field.type === 'time' ? 'time'
+      : field.type === 'url' ? 'url'
+      : field.type === 'phone' ? 'tel'
+      : 'text'
+
+  return <input
+    id={field.name}
+    type={inputType}
+    name={field.name}
+    value={scalar(value)}
+    placeholder={field.placeholder}
+    required={field.required}
+    min={field.min}
+    max={field.max}
+    step={field.step}
+    onChange={(e) => onChange(
+      field.type === 'number' || field.type === 'range'
+        ? e.currentTarget.valueAsNumber
+        : e.currentTarget.value
+    )}
+  />
 }
 
 export const CleverForm = ({ form, apiURL, submissionsSlug, className, initialValues = {}, onSuccess, onError }: CleverFormProps) => {
